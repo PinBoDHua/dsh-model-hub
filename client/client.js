@@ -127,12 +127,48 @@
     return errs
   }
 
+  // ===== v0.3 下拉选项纯逻辑 =====
+
+  function filterOptions(t) {
+    return [
+      { value: 'all', label: t('filterAll'), icon: 'layers' },
+      { value: 'recommended', label: t('filterRecommended'), icon: 'star' },
+      { value: 'verified', label: t('filterVerified'), icon: 'check' },
+      { value: 'unverified', label: t('filterUnverified'), icon: 'alert' },
+    ]
+  }
+
+  function devRoleOptions(t) {
+    return [{ value: '', label: t('unset') }, { value: 'false', label: 'false' }, { value: 'true', label: 'true' }]
+  }
+
+  function levelOptions() {
+    return LEVELS.map(function (L) { return { value: L, label: L } })
+  }
+
+  function formatOptions(t) {
+    return [{ value: '', label: t('unset') }].concat(FORMATS.map(function (f) { return { value: f, label: f } }))
+  }
+
+  function fieldOptions(t) {
+    return [{ value: '', label: t('unset') }].concat(MAXFIELDS.map(function (f) { return { value: f, label: f } }))
+  }
+
+  // Select 值匹配：String 宽松比较（与 dsh-memory 同口径），未命中 -1
+  function selectedIndexOf(options, value) {
+    var list = Array.isArray(options) ? options : []
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].value) === String(value)) return i
+    }
+    return -1
+  }
+
   // ===== locale =====
 
   var NS = 'dsh-model-hub'
   var ZH = {
     title: '百炼模型库', subtitle: '实测目录 · 一键接入 · 智能合并',
-    search: '搜索模型 id / 名称', filterAll: '全部', filterRecommended: '推荐', filterVerified: '已验证', filterUnverified: '未验证',
+    search: '搜索模型 id / 名称', filterLabel: '筛选模型', filterAll: '全部', filterRecommended: '推荐', filterVerified: '已验证', filterUnverified: '未验证',
     selectRecommended: '选中推荐', clear: '清空选择', applySelected: '应用选中', discover: '发现新模型', verifyAll: '全部复验',
     context: '上下文', maxOutput: '最大输出', input: '输入', effort: '推理档位', effortNone: '非推理',
     recommended: '推荐', verified: '已验证', unverified: '未验证',
@@ -152,7 +188,7 @@
   }
   var EN = {
     title: 'Bailian Model Hub', subtitle: 'Verified catalog · one-click apply · smart merge',
-    search: 'Search model id / name', filterAll: 'All', filterRecommended: 'Recommended', filterVerified: 'Verified', filterUnverified: 'Unverified',
+    search: 'Search model id / name', filterLabel: 'Filter models', filterAll: 'All', filterRecommended: 'Recommended', filterVerified: 'Verified', filterUnverified: 'Unverified',
     selectRecommended: 'Select recommended', clear: 'Clear', applySelected: 'Apply selected', discover: 'Discover', verifyAll: 'Re-verify all',
     context: 'Context', maxOutput: 'Max output', input: 'Input', effort: 'Effort', effortNone: 'Non-reasoning',
     recommended: 'Recommended', verified: 'Verified', unverified: 'Unverified',
@@ -188,7 +224,6 @@
     '.mh_dot_ok{background:#10b981;}.mh_dot_bad{background:#ef4444;}.mh_dot_idle{background:#9ca3af;}',
     '.mh_toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}',
     '.mh_search{flex:1;min-width:160px;padding:6px 10px;border:1px solid var(--dsw-alias-line,#e5e7eb);border-radius:8px;background:transparent;color:inherit;font-size:13px;}',
-    '.mh_select{padding:6px 8px;border:1px solid var(--dsw-alias-line,#e5e7eb);border-radius:8px;background:transparent;color:inherit;font-size:12px;}',
     '.mh_btn{padding:6px 12px;border:1px solid var(--dsw-alias-line,#e5e7eb);border-radius:8px;background:transparent;color:inherit;font-size:12px;cursor:pointer;}',
     '.mh_btn:hover{background:var(--dsw-alias-fill-hover,rgba(0,0,0,.04));}',
     '.mh_btn:disabled{opacity:.5;cursor:default;}',
@@ -223,13 +258,43 @@
     '.mh_erow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}',
     '.mh_elabel{font-size:11px;color:var(--dsw-alias-text-caption,#6b7280);min-width:70px;}',
     '.mh_enum{width:110px;padding:4px 6px;border:1px solid var(--dsw-alias-line,#e5e7eb);border-radius:6px;background:transparent;color:inherit;font-size:12px;}',
-    '.mh_esel{padding:4px 6px;border:1px solid var(--dsw-alias-line,#e5e7eb);border-radius:6px;background:transparent;color:inherit;font-size:12px;}',
     '.mh_ewire{width:90px;padding:4px 6px;border:1px solid var(--dsw-alias-line,#e5e7eb);border-radius:6px;background:transparent;color:inherit;font-size:12px;font-family:ui-monospace,monospace;}',
     '.mh_echeck{display:flex;gap:6px;align-items:center;font-size:12px;}',
     '.mh_evidence{font-size:11px;color:var(--dsw-alias-text-caption,#6b7280);display:flex;flex-wrap:wrap;gap:4px 10px;}',
     '.mh_eactions{display:flex;gap:8px;}',
     '.mh_btn_danger{border-color:#ef4444;color:#b91c1c;}',
     'body[data-ds-dark-theme] .mh_btn_danger{color:#f87171;}',
+    // ---- v0.3 自定义下拉：派生令牌（宿主令牌名已核实定义）+ Select 规则，移植自 dsh-memory ----
+    '.mh_panel,.mh_select_pop{--mh-bg:var(--dsw-alias-bg-base,#f6f8fc);--mh-surface:var(--dsw-alias-bg-layer-1,#ffffff);--mh-raised:color-mix(in srgb,var(--mh-ink) 3.5%,var(--mh-bg));--mh-ink:var(--dsw-alias-label-primary,#141821);--mh-ink2:var(--dsw-alias-label-secondary,#4b5565);--mh-ink3:var(--dsw-alias-label-tertiary,#8a93a3);--mh-line:var(--dsw-alias-border-l1,#dbe2ee);--mh-line2:var(--dsw-alias-border-l2,#c6d2e4);--mh-primary:var(--dsw-alias-state-business-primary,#2154ce);--mh-accent-soft:color-mix(in srgb,var(--mh-primary) 10%,transparent);--mh-accent-line:color-mix(in srgb,var(--mh-primary) 38%,transparent);--mh-mono:var(--ds-font-family-code,ui-monospace,"Cascadia Mono",Consolas,monospace);--mh-pop:0 14px 40px -18px rgba(16,25,45,.32),0 2px 6px rgba(16,25,45,.06);--mh-ring:0 0 0 3px color-mix(in srgb,var(--mh-primary) 20%,transparent);}',
+    'body[data-ds-dark-theme] .mh_panel,body[data-ds-dark-theme] .mh_select_pop{--mh-bg:var(--dsw-alias-bg-base,#0f1115);--mh-surface:var(--dsw-alias-bg-layer-1,#171a21);--mh-ink:var(--dsw-alias-label-primary,#e8eaf0);--mh-ink2:var(--dsw-alias-label-secondary,#a8aebd);--mh-ink3:var(--dsw-alias-label-tertiary,#6f7688);--mh-line:var(--dsw-alias-border-l1,rgba(232,234,240,.08));--mh-line2:var(--dsw-alias-border-l2,rgba(232,234,240,.16));--mh-pop:0 18px 44px -20px rgba(0,0,0,.85),0 2px 8px rgba(0,0,0,.45);}',
+    '.mh_select_trigger{display:inline-flex;align-items:center;gap:7px;height:32px;width:100%;box-sizing:border-box;border:1px solid var(--mh-line);border-radius:6px;background:transparent;color:var(--mh-ink2);padding:0 8px 0 10px;font:inherit;font-size:12.5px;cursor:pointer;max-width:320px;transition:color .13s,background-color .13s,border-color .13s;}',
+    '.mh_select_trigger:hover{color:var(--mh-ink);background:var(--mh-raised);border-color:var(--mh-line2);}',
+    '.mh_select_trigger:focus-visible{outline:none;border-color:var(--mh-primary);box-shadow:var(--mh-ring);}',
+    '.mh_select_open{border-color:var(--mh-accent-line);background:var(--mh-surface);color:var(--mh-ink);}',
+    '.mh_select_disabled{opacity:.42;cursor:default;}',
+    '.mh_select_val_icon{display:flex;color:var(--mh-ink3);flex-shrink:0;}',
+    '.mh_select_value{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}',
+    '.mh_select_chev{display:flex;color:var(--mh-ink3);flex-shrink:0;transition:transform .18s;}',
+    '.mh_select_open .mh_select_chev{transform:rotate(180deg);color:var(--mh-ink2);}',
+    '.mh_select_pop{position:fixed;z-index:1200;box-sizing:border-box;background:var(--mh-surface);border:1px solid var(--mh-line2);border-radius:8px;box-shadow:var(--mh-pop);padding:5px;max-height:320px;overflow-y:auto;animation:mh_fade .12s ease;transform-origin:top center;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--mh-ink) 20%,transparent) transparent;}',
+    '.mh_select_pop::-webkit-scrollbar{width:8px;}',
+    '.mh_select_pop::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--mh-ink) 18%,transparent);border-radius:8px;}',
+    '.mh_select_up{transform-origin:bottom center;}',
+    '.mh_select_opt{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;cursor:pointer;font-size:12.5px;color:var(--mh-ink);transition:background-color .1s,color .1s;}',
+    '.mh_select_opt_active{background:color-mix(in srgb,var(--mh-ink) 6%,transparent);}',
+    '.mh_select_opt_sel{color:var(--mh-ink);font-weight:600;background:var(--mh-accent-soft);}',
+    '.mh_select_opt_sel.mh_select_opt_active{background:color-mix(in srgb,var(--mh-primary) 16%,transparent);}',
+    '.mh_select_opt_disabled{opacity:.4;cursor:default;}',
+    '.mh_select_opt_icon{display:flex;color:var(--mh-ink3);flex-shrink:0;}',
+    '.mh_select_opt_sel .mh_select_opt_icon{color:var(--mh-primary);}',
+    '.mh_select_opt_spacer{width:14px;}',
+    '.mh_select_opt_label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
+    '.mh_select_opt_hint{font:500 10.5px var(--mh-mono);color:var(--mh-ink3);flex-shrink:0;}',
+    '.mh_select_opt_check{color:var(--mh-primary);flex-shrink:0;}',
+    '.mh_editor .mh_select_trigger{height:30px;max-width:240px;border:1px solid var(--mh-line2);background:var(--mh-bg);}',
+    '@keyframes mh_fade{from{opacity:0;}to{opacity:1;}}',
+    '@media (prefers-reduced-motion:reduce){.mh_select_trigger,.mh_select_chev,.mh_select_pop{animation:none !important;transition:none !important;}}',
+    '.mh_select_disabled:hover{border-color:var(--mh-line);background:transparent;}',
   ].join('\n')
 
   var API_BASE = '/plugins/dsh-model-hub'
@@ -243,8 +308,32 @@
       var h = React.createElement
       var useState = React.useState
       var useEffect = React.useEffect
+      var useLayoutEffect = React.useLayoutEffect
       var useRef = React.useRef
       var useCallback = React.useCallback
+      var ReactDOM = require('react-dom')
+      var selectSeq = 0
+
+      // ===== 图标（内联 SVG，stroke=currentColor；路径取自 dsh-memory ICONS 字典） =====
+      var ICONS = {
+        check: ['M5 13l4 4L19 7'],
+        chevD: ['M6 9l6 6 6-6'],
+        alert: ['M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z', 'M12 9v4', 'M12 17h.01'],
+        star: ['M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z'],
+        info: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M12 8h.01', 'M12 11v5'],
+        layers: ['M12 3l9 5-9 5-9-5 9-5z', 'M3 13l9 5 9-5'],
+      }
+
+      function Icon(props) {
+        var paths = ICONS[props.name] || ICONS.info
+        var size = props.size || 16
+        return h('svg', {
+          width: size, height: size, viewBox: '0 0 24 24', fill: 'none',
+          stroke: 'currentColor', strokeWidth: props.strokeWidth || 1.8,
+          strokeLinecap: 'round', strokeLinejoin: 'round',
+          'aria-hidden': true, className: props.className, style: props.style,
+        }, paths.map(function (d, i) { return h('path', { key: i, d: d }) }))
+      }
 
       function createApi(tokenRef) {
         function request(path, options) {
@@ -282,6 +371,194 @@
         return h('span', { className: 'mh_badge mh_badge_' + kind }, props.t(kind))
       }
 
+      // 自定义无障碍下拉：button + portal 浮层 listbox，彻底主题化（原生 select 弹出层无法跨浏览器主题化）。
+      // 浮层 portal 到 body，避开工具栏的 backdrop-filter 包含块与 overflow 裁剪；fixed 坐标即视口坐标。
+      // 自 dsh-memory v0.31.1 Select 行为等价移植（dm→mh 改名），见 docs/DESIGN-CONSENSUS-v0.3.0.md。
+      function Select(props) {
+        var options = props.options || []
+        var value = props.value
+        var disabled = props.disabled
+        var openState = useState(false)
+        var open = openState[0]; var setOpen = openState[1]
+        var activeState = useState(-1)
+        var active = activeState[0]; var setActive = activeState[1]
+        var posState = useState(null)
+        var pos = posState[0]; var setPos = posState[1]
+        var rootRef = useRef(null)
+        var triggerRef = useRef(null)
+        var listRef = useRef(null)
+        var typeRef = useRef({ buf: '', t: 0 })
+        var focusPendingRef = useRef(false)
+        var idRef = useRef(null)
+        if (idRef.current === null) { selectSeq += 1; idRef.current = 'mh-sel-' + selectSeq }
+        var activeRef = useRef(active); activeRef.current = active
+
+        var selectedIndex = selectedIndexOf(options, value)
+        var selected = selectedIndex >= 0 ? options[selectedIndex] : null
+
+        function enabledIndexes() {
+          var a = []
+          for (var k = 0; k < options.length; k++) { if (!options[k].disabled) a.push(k) }
+          return a
+        }
+        function place() {
+          var trig = triggerRef.current
+          if (!trig) return
+          var r = trig.getBoundingClientRect()
+          // 严格等宽：弹出层宽度＝触发按钮的渲染宽度（按钮已带稳定最小宽），
+          // 左右边缘完全对齐，读起来是同一件控件而非两块板。
+          var width = r.width
+          var list = listRef.current
+          var height = list ? Math.min(list.offsetHeight, 300) : 260
+          var spaceBelow = window.innerHeight - r.bottom
+          var up = spaceBelow < height + 8 && r.top > spaceBelow
+          var top = up ? Math.max(8, r.top - height - 4) : Math.min(r.bottom + 4, Math.max(8, window.innerHeight - height - 8))
+          var left = Math.min(Math.max(8, r.left), Math.max(8, window.innerWidth - width - 8))
+          setPos({ top: top, left: left, width: width, up: up })
+        }
+        function openList() {
+          if (disabled) return
+          var en = enabledIndexes()
+          setActive(selectedIndex >= 0 ? selectedIndex : (en.length ? en[0] : -1))
+          focusPendingRef.current = true
+          setOpen(true)
+        }
+        function closeList(refocus) {
+          setOpen(false)
+          setPos(null)
+          if (refocus && triggerRef.current) triggerRef.current.focus()
+        }
+        function choose(idx) {
+          var opt = options[idx]
+          if (!opt || opt.disabled) return
+          props.onChange(opt.value)
+          closeList(true)
+        }
+        function move(delta) {
+          var en = enabledIndexes()
+          if (en.length === 0) return
+          var cur = en.indexOf(activeRef.current)
+          var next = cur === -1 ? (delta > 0 ? 0 : en.length - 1) : (cur + delta + en.length) % en.length
+          setActive(en[next])
+        }
+        function edge(which) {
+          var en = enabledIndexes()
+          if (en.length) setActive(which === 'first' ? en[0] : en[en.length - 1])
+        }
+        function typeAhead(ch) {
+          var now = Date.now()
+          var st = typeRef.current
+          if (now - st.t > 600) st.buf = ''
+          st.t = now
+          st.buf += ch.toLowerCase()
+          var en = enabledIndexes()
+          for (var k = 0; k < en.length; k++) {
+            var lbl = String(options[en[k]].label || '').toLowerCase()
+            if (lbl.indexOf(st.buf) === 0) { setActive(en[k]); return }
+          }
+        }
+
+        useLayoutEffect(function () {
+          if (!open) return undefined
+          place()
+          function onDoc(e) {
+            var inTrigger = triggerRef.current && triggerRef.current.contains(e.target)
+            var inList = listRef.current && listRef.current.contains(e.target)
+            if (!inTrigger && !inList) closeList(false)
+          }
+          function onScroll() { place() }
+          function onResize() { place() }
+          document.addEventListener('mousedown', onDoc)
+          window.addEventListener('scroll', onScroll, true)
+          window.addEventListener('resize', onResize)
+          return function () {
+            document.removeEventListener('mousedown', onDoc)
+            window.removeEventListener('scroll', onScroll, true)
+            window.removeEventListener('resize', onResize)
+          }
+        }, [open])
+
+        // 浮层首帧 pos 为空、样式为 visibility:hidden（隐藏元素无法获得焦点），
+        // 必须在 place() 定位完成后的下一次布局提交里再聚焦，否则键盘导航无入口。
+        useLayoutEffect(function () {
+          if (!open || pos === null || !focusPendingRef.current) return
+          focusPendingRef.current = false
+          var list = listRef.current
+          if (list) list.focus()
+        }, [open, pos])
+
+        useLayoutEffect(function () {
+          if (!open || !listRef.current) return
+          var el = listRef.current.querySelector('[data-index="' + active + '"]')
+          if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' })
+        }, [active, open])
+
+        function onTriggerKey(e) {
+          if (disabled) return
+          // 正常情况下打开后焦点会移入浮层；若聚焦仍停在触发器（例如浮层刚被重排），
+          // Esc 也要能收起浮层而不是误关外层容器。
+          if (open && e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeList(true); return }
+          if (!open && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault()
+            openList()
+          }
+        }
+        function onListKey(e) {
+          switch (e.key) {
+            case 'ArrowDown': e.preventDefault(); move(1); break
+            case 'ArrowUp': e.preventDefault(); move(-1); break
+            case 'Home': e.preventDefault(); edge('first'); break
+            case 'End': e.preventDefault(); edge('last'); break
+            case 'Enter': case ' ': e.preventDefault(); choose(activeRef.current); break
+            case 'Escape': e.preventDefault(); e.stopPropagation(); closeList(true); break
+            case 'Tab': e.preventDefault(); closeList(true); break
+            default:
+              if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); typeAhead(e.key) }
+          }
+        }
+
+        var wrapStyle = Object.assign({}, props.minWidth ? { minWidth: props.minWidth } : null, props.style)
+        var trigger = h('div', { className: 'mh_selectwrap' + (props.className ? ' ' + props.className : ''), ref: rootRef, style: wrapStyle },
+          h('button', {
+            type: 'button', ref: triggerRef, id: props.id,
+            className: 'mh_select_trigger' + (open ? ' mh_select_open' : '') + (disabled ? ' mh_select_disabled' : ''),
+            disabled: disabled, 'aria-haspopup': 'listbox', 'aria-expanded': open, 'aria-label': props.ariaLabel,
+            // 浮层未渲染时不设 aria-controls（避免指向不存在的 id）。
+            'aria-controls': open ? idRef.current : undefined,
+            onClick: function () { if (open) closeList(true); else openList() },
+            onKeyDown: onTriggerKey,
+          },
+            selected && selected.icon ? h(Icon, { name: selected.icon, size: 14, className: 'mh_select_val_icon' }) : null,
+            h('span', { className: 'mh_select_value' }, selected ? selected.label : (props.placeholder || '')),
+            h('span', { className: 'mh_select_chev' }, h(Icon, { name: 'chevD', size: 14 }))))
+
+        if (!open) return trigger
+
+        var pop = h('div', {
+          className: 'mh_select_pop' + (pos && pos.up ? ' mh_select_up' : ''),
+          style: pos ? { top: pos.top, left: pos.left, width: pos.width } : { top: -9999, left: -9999, visibility: 'hidden' },
+          role: 'listbox', ref: listRef, id: idRef.current, tabIndex: -1, 'aria-label': props.ariaLabel,
+          'aria-activedescendant': active >= 0 ? (idRef.current + '-opt-' + active) : undefined,
+          onKeyDown: onListKey,
+        }, options.map(function (opt, idx) {
+          var isSel = String(opt.value) === String(value)
+          var isActive = idx === active
+          return h('div', {
+            key: String(opt.value) + '-' + idx, id: idRef.current + '-opt-' + idx, 'data-index': idx,
+            role: 'option', 'aria-selected': isSel, 'aria-disabled': opt.disabled || undefined,
+            className: 'mh_select_opt' + (isActive ? ' mh_select_opt_active' : '') + (isSel ? ' mh_select_opt_sel' : '') + (opt.disabled ? ' mh_select_opt_disabled' : ''),
+            onMouseEnter: function () { if (!opt.disabled) setActive(idx) },
+            onClick: function () { choose(idx) },
+          },
+            opt.icon ? h(Icon, { name: opt.icon, size: 14, className: 'mh_select_opt_icon' }) : h('span', { className: 'mh_select_opt_icon mh_select_opt_spacer' }),
+            h('span', { className: 'mh_select_opt_label', title: opt.label }, opt.label),
+            opt.hint ? h('span', { className: 'mh_select_opt_hint' }, opt.hint) : null,
+            isSel ? h(Icon, { name: 'check', size: 14, strokeWidth: 2.4, className: 'mh_select_opt_check' }) : null)
+        }))
+
+        return h(React.Fragment, null, trigger, ReactDOM.createPortal(pop, document.body))
+      }
+
       function EditorForm(props) {
         var entry = props.entry, t = props.t
         var ds = useState(function () { return draftFromEntry(entry) })
@@ -316,22 +593,18 @@
           draft.reasoning ? h('div', null,
             draft.rows.map(function (r, i) {
               return h('div', { className: 'mh_erow', key: i },
-                h('select', { className: 'mh_esel', value: r.level, onChange: function (e) { setRow(i, { level: e.target.value, wire: e.target.value === 'off' ? '' : (r.wire || e.target.value) }) } },
-                  LEVELS.map(function (L) { return h('option', { key: L, value: L }, L) })),
+                h(Select, { options: levelOptions(), value: r.level, onChange: function (v) { setRow(i, { level: v, wire: v === 'off' ? '' : (r.wire || v) }) }, minWidth: 110, ariaLabel: t('level') }),
                 h('input', { className: 'mh_ewire', value: r.wire, placeholder: t('wire'), disabled: r.level === 'off', onChange: function (e) { setRow(i, { wire: e.target.value }) } }),
                 h('button', { className: 'mh_mini', onClick: function () { delRow(i) } }, '×'))
             }),
             h('button', { className: 'mh_mini', onClick: addRow }, t('addLevel'))) : null,
           h('div', { className: 'mh_erow' },
             h('span', { className: 'mh_elabel' }, t('compatDev')),
-            h('select', { className: 'mh_esel', value: draft.devRole, onChange: function (e) { set({ devRole: e.target.value }) } },
-              h('option', { value: '' }, t('unset')), h('option', { value: 'false' }, 'false'), h('option', { value: 'true' }, 'true')),
+            h(Select, { options: devRoleOptions(t), value: draft.devRole, onChange: function (v) { set({ devRole: v }) }, minWidth: 100, ariaLabel: t('compatDev') }),
             h('span', { className: 'mh_elabel' }, t('compatFormat')),
-            h('select', { className: 'mh_esel', value: draft.thinkingFormat, onChange: function (e) { set({ thinkingFormat: e.target.value }) } },
-              h('option', { value: '' }, t('unset')), FORMATS.map(function (f) { return h('option', { key: f, value: f }, f) })),
+            h(Select, { options: formatOptions(t), value: draft.thinkingFormat, onChange: function (v) { set({ thinkingFormat: v }) }, minWidth: 170, ariaLabel: t('compatFormat') }),
             h('span', { className: 'mh_elabel' }, t('compatField')),
-            h('select', { className: 'mh_esel', value: draft.maxTokensField, onChange: function (e) { set({ maxTokensField: e.target.value }) } },
-              h('option', { value: '' }, t('unset')), MAXFIELDS.map(function (f) { return h('option', { key: f, value: f }, f) }))),
+            h(Select, { options: fieldOptions(t), value: draft.maxTokensField, onChange: function (v) { set({ maxTokensField: v }) }, minWidth: 180, ariaLabel: t('compatField') })),
           h('div', { className: 'mh_evidence' },
             h('span', null, t('evidence') + ':'),
             h('span', null, 'developer ' + (ev.developerRole === 'ok' ? t('devOk') : ev.developerRole === 'rejected' ? t('devRejected') : '—')),
@@ -447,11 +720,7 @@
             h('span', null, h('span', { className: 'mh_dot ' + (credential.configured ? 'mh_dot_ok' : 'mh_dot_bad') }), credential.configured ? t('credentialOk') : t('credentialMissing'))),
           h('div', { className: 'mh_toolbar' },
             h('input', { className: 'mh_search', placeholder: t('search'), value: query, onChange: function (e) { setQuery(e.target.value) } }),
-            h('select', { className: 'mh_select', value: filter, onChange: function (e) { setFilter(e.target.value) } },
-              h('option', { value: 'all' }, t('filterAll')),
-              h('option', { value: 'recommended' }, t('filterRecommended')),
-              h('option', { value: 'verified' }, t('filterVerified')),
-              h('option', { value: 'unverified' }, t('filterUnverified'))),
+            h(Select, { options: filterOptions(t), value: filter, onChange: setFilter, minWidth: 140, ariaLabel: t('filterLabel') }),
             h('button', { className: 'mh_btn', onClick: function () { setSelected(recIds) }, disabled: busy || !recIds.length }, t('selectRecommended')),
             h('button', { className: 'mh_btn', onClick: function () { setSelected([]) }, disabled: busy || !selected.length }, t('clear')),
             h('button', { className: 'mh_btn mh_btn_primary', onClick: doApply, disabled: busy || !selected.length }, t('applySelected') + (selected.length ? ' (' + selected.length + ')' : '')),
@@ -542,6 +811,6 @@
 
   // ===== UMD 尾部：纯逻辑供 node 单测 =====
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { nextToken: nextToken, toggleId: toggleId, badgeKind: badgeKind, filterModels: filterModels, effortSummary: effortSummary, fmtTokens: fmtTokens, fmt: fmt, draftFromEntry: draftFromEntry, draftToPayload: draftToPayload, clientValidate: clientValidate, LEVELS: LEVELS, FORMATS: FORMATS, MAXFIELDS: MAXFIELDS }
+    module.exports = { nextToken: nextToken, toggleId: toggleId, badgeKind: badgeKind, filterModels: filterModels, effortSummary: effortSummary, fmtTokens: fmtTokens, fmt: fmt, draftFromEntry: draftFromEntry, draftToPayload: draftToPayload, clientValidate: clientValidate, LEVELS: LEVELS, FORMATS: FORMATS, MAXFIELDS: MAXFIELDS, filterOptions: filterOptions, devRoleOptions: devRoleOptions, levelOptions: levelOptions, formatOptions: formatOptions, fieldOptions: fieldOptions, selectedIndexOf: selectedIndexOf }
   }
 })(typeof window !== 'undefined' ? window : globalThis)

@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-hub",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "模型库 —— DeepSeek Harness 百炼模型接入管理层：在官方 dsh-llm-pi-ai 适配器之上，提供经实测的百炼模型目录（推理档位/developer角色/工具/maxTokens字段逐模型验证）、一键智能合并应用（保留用户自加模型、复用凭据）、运行时复验与端点发现兜底；嵌入官方 Models 设置页（footer 模型库面板 + provider-card 状态），并给官方模型选择器注入已验证/推荐徽标。Model hub for DeepSeek Harness: a verified Bailian model catalog with one-click smart-merge apply on top of the official pi-ai adapter.",
   "type": "module",
   "main": "index.js",

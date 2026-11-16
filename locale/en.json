@@ -1,4 +1,6 @@
 {
-  "name": "Model Hub",
-  "description": "Bailian model access layer: verified catalog, one-click smart-merge apply, runtime re-verification and discovery."
+  "meta": {
+    "title": "Model hub",
+    "description": "Bailian model access layer: verified catalog, one-click smart-merge apply, runtime re-verification and discovery."
+  }
 }

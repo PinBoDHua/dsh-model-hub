@@ -125,3 +125,49 @@ test('clientValidate 抓非法容量/空模态/空wire/重复档位', () => {
   d5.rows = [{ level: 'off', wire: '' }]
   assert.ok(clientValidate(d5).includes('effort-level'))
 })
+
+// ===== v0.3 下拉选项纯逻辑 =====
+
+const { filterOptions, devRoleOptions, levelOptions, formatOptions, fieldOptions, selectedIndexOf, LEVELS, FORMATS, MAXFIELDS } = require('../client/client.js')
+const tt = (k) => k // locale 桩：键即文案
+
+test('filterOptions 四项 value/label/icon', () => {
+  const opts = filterOptions(tt)
+  assert.deepEqual(opts.map((o) => o.value), ['all', 'recommended', 'verified', 'unverified'])
+  assert.deepEqual(opts.map((o) => o.icon), ['layers', 'star', 'check', 'alert'])
+  assert.deepEqual(opts.map((o) => o.label), ['filterAll', 'filterRecommended', 'filterVerified', 'filterUnverified'])
+})
+
+test('devRoleOptions 三值，默认在前', () => {
+  const opts = devRoleOptions(tt)
+  assert.deepEqual(opts.map((o) => o.value), ['', 'false', 'true'])
+  assert.equal(opts[0].label, 'unset')
+  assert.ok(opts.every((o) => !o.icon))
+})
+
+test('levelOptions = LEVELS 纯文本', () => {
+  const opts = levelOptions()
+  assert.deepEqual(opts.map((o) => o.value), LEVELS)
+  assert.ok(opts.every((o) => o.label === o.value && !o.icon))
+})
+
+test('formatOptions/fieldOptions 默认在前 + 枚举齐全', () => {
+  const f = formatOptions(tt)
+  assert.equal(f[0].value, '')
+  assert.equal(f[0].label, 'unset')
+  assert.deepEqual(f.slice(1).map((o) => o.value), FORMATS)
+  const m = fieldOptions(tt)
+  assert.equal(m[0].value, '')
+  assert.equal(m[0].label, 'unset')
+  assert.deepEqual(m.slice(1).map((o) => o.value), MAXFIELDS)
+})
+
+test('selectedIndexOf String 宽松比较与未命中', () => {
+  const opts = [{ value: '' }, { value: 'false' }, { value: 'true' }]
+  assert.equal(selectedIndexOf(opts, ''), 0)
+  assert.equal(selectedIndexOf(opts, 'true'), 2)
+  assert.equal(selectedIndexOf([{ value: 1 }], '1'), 0)
+  assert.equal(selectedIndexOf(opts, 'nope'), -1)
+  assert.equal(selectedIndexOf([], 'x'), -1)
+  assert.equal(selectedIndexOf(null, 'x'), -1)
+})
