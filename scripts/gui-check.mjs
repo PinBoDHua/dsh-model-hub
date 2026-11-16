@@ -1,5 +1,5 @@
 /**
- * dsh-model-hub 真实 GUI 验证脚本（Edge headless + CDP）—— v0.3.0 自定义无障碍下拉。
+ * dsh-model-hub 真实 GUI 验证脚本（Edge headless + CDP）—— v0.4.0 多平台 + 自定义无障碍下拉。
  *
  * 为什么需要它：单测覆盖纯逻辑（filterOptions/draft roundtrip），但「button 触发器 +
  * portal listbox」的真实键盘行为、焦点归还、浮层定位/等宽/近底翻转、暗色令牌切换，
@@ -25,6 +25,8 @@
  *     浮层暗色 surface 断言+截图，测完点原主题（缺省「跟随系统」）恢复）
  *   9 近底翻转（CDP 压矮视口构造近底，.mh_select_up 或 pop.top<trigger.top；不便构造则 SKIP）
  *   10 只读安全自检（全程不得发出 apply/edit/reset/discover/verify/set-default/measure 写请求）
+ *   11 多平台 UI（平台切换行/16 选项/切 DeepSeek 目录与提示/切回百炼/provider-card 泛化；全读操作）
+ *   12 选择器徽标（composer 模型菜单 aliyun 行 ★/✓；尽力而为，可 SKIP；只开菜单不点选）
  *
  * 导航配方（lead 已在 live GUI 手动验证）：主界面无直接「设置」按钮 → 点左下角
  * aria-label=账号菜单 → 菜单项文本为「设置Ctrl+Alt+,」（前缀匹配，勿精确等于）→
@@ -35,7 +37,7 @@
  * 浏览器是独立 headless Edge + 一次性临时 profile，不影响用户正在使用的桌面 app。
  * 登录 cookie 由本机 <DSH_HOME>/.credentials.yaml 的 browser-session secret 自签
  * （与 dsh-client-connection 同一算法），仅用于回环地址；输出不打印任何密钥/token。
- * 截图默认写入 docs/verification-assets-v0.3.0/（运行产物，--shots 可覆盖）。
+ * 截图默认写入 docs/verification-assets-v0.4.0/（运行产物，--shots 可覆盖）。
  */
 import { spawn } from 'node:child_process'
 import { createHash, createHmac } from 'node:crypto'
@@ -50,7 +52,7 @@ const argOf = (name) => argv.find((a) => a.startsWith(`--${name}=`))?.split('=')
 const HELP = argv.includes('--help') || argv.includes('-h')
 const SMOKE = argv.includes('--smoke')
 const BASE = argOf('url') ?? ''
-const SHOTS = path.resolve(argOf('shots') ?? fileURLToPath(new URL('../docs/verification-assets-v0.3.0/', import.meta.url)))
+const SHOTS = path.resolve(argOf('shots') ?? fileURLToPath(new URL('../docs/verification-assets-v0.4.0/', import.meta.url)))
 // 动态默认 CDP 端口：固定端口会让并发运行连到同一个 Edge 页面（与 memory 脚本同策略）。
 const CDP_PORT = Number(argOf('cdp-port') ?? (9300 + Math.floor(Math.random() * 600)))
 const USER_DATA = path.join(os.tmpdir(), `dsh-model-hub-gui-profile-${process.pid}`)
@@ -62,13 +64,13 @@ const USAGE = `用法：node scripts/gui-check.mjs --url=http://127.0.0.1:<端�
   --edge=<路径>   Edge 可执行文件；缺省依次尝试 env EDGE_PATH、
                   C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe、
                   C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe
-  --shots=<目录>  截图输出目录；缺省 <插件>/docs/verification-assets-v0.3.0/
+  --shots=<目录>  截图输出目录；缺省 <插件>/docs/verification-assets-v0.4.0/
   --smoke         只跑脚手架冒烟（Edge 启动/cookie 自签/导航 Models 页/.mh_panel），
                   不跑 0.3.0 断言——旧版 GUI 也可用于验证脚手架
   --cdp-port=<n>  CDP 端口（缺省 9300-9899 随机，避免并发互串）
   --help          显示本说明
 检查项：1 面板渲染 2 筛选打开 3 键盘选择+过滤 4 Esc 5 外部点击 6 等宽
-        7 编辑器下拉 8 暗色分支 9 近底翻转(可 SKIP) 10 只读安全自检
+        7 编辑器下拉 8 暗色分支 9 近底翻转(可 SKIP) 10 只读安全自检 11 多平台 UI 12 选择器徽标(可 SKIP)
 退出码：全部通过=0；任一失败或脚手架异常=1；--help=0；缺 --url=1。`
 
 function resolveEdge() {
@@ -378,6 +380,19 @@ async function pickOptionByIndex(idx) {
 async function pickOptionByLabel(label) {
   const ok = await evaluate(`(() => {
     const opt = [...document.querySelectorAll('.mh_select_pop .mh_select_opt')].find(o => ((o.querySelector('.mh_select_opt_label') || {}).textContent || '').trim() === ${JSON.stringify(label)})
+    if (!opt) return false
+    opt.click()
+    return true
+  })()`)
+  await sleep(350)
+  return ok
+}
+
+/** 点击浮层内 label 正则匹配的选项（v0.4 平台名随宿主 locale 变化）。 */
+async function pickOptionByRegex(reSrc) {
+  const ok = await evaluate(`(() => {
+    const re = new RegExp(${JSON.stringify(reSrc)}, 'i')
+    const opt = [...document.querySelectorAll('.mh_select_pop .mh_select_opt')].find(o => re.test(((o.querySelector('.mh_select_opt_label') || {}).textContent || '').trim()))
     if (!opt) return false
     opt.click()
     return true
@@ -970,6 +985,90 @@ async function main() {
         }
         return true
       })()`)
+
+      // [11] v0.4 多平台 UI：平台切换行 / 16 选项 / 目录切换 / 目录路由提示 / provider-card 泛化。
+      // 全部为客户端本地状态 + GET catalog/status，不触碰写端点（[10] 兜底审计）。
+      const PROVIDER_TRIGGER = `[...document.querySelectorAll('.mh_panel .mh_provider_row .mh_select_trigger')].find(el => /^(平台|Platform)$/i.test((el.getAttribute('aria-label') || '').trim()))`
+      const p11a = await evaluate(`(() => {
+        const t = ${PROVIDER_TRIGGER}
+        const panel = document.querySelector('.mh_panel')
+        return { trigger: Boolean(t), label: t ? ((t.querySelector('.mh_select_value') || {}).textContent || '').trim() : null, cards: panel ? panel.querySelectorAll('.mh_card').length : 0 }
+      })()`)
+      check(11, '平台切换行存在且默认百炼', p11a.trigger && /百炼|Bailian/i.test(p11a.label || ''), JSON.stringify(p11a))
+      await evaluate(`(() => { const t = ${PROVIDER_TRIGGER}; if (t) t.click(); return Boolean(t) })()`)
+      const s11 = await waitPop()
+      check(11, '平台下拉：16 个平台选项', s11.open && s11.opts.length === 16, JSON.stringify({ open: s11.open, n: s11.opts.length }))
+      await shot('12-provider-open.png')
+      const pickedDs = await pickOptionByRegex('^DeepSeek$')
+      await sleep(1500)
+      const p11b = await evaluate(`(() => {
+        const panel = document.querySelector('.mh_panel')
+        if (!panel) return null
+        const ids = [...panel.querySelectorAll('.mh_card .mh_id')].map(x => (x.textContent || '').trim())
+        const note = panel.querySelector('.mh_note')
+        const t = ${PROVIDER_TRIGGER}
+        return { ids, note: note ? (note.textContent || '').slice(0, 40) : null, label: t ? ((t.querySelector('.mh_select_value') || {}).textContent || '').trim() : null }
+      })()`)
+      check(11, '切到 DeepSeek：目录变为 deepseek 模型 + 目录路由提示出现',
+        pickedDs && Boolean(p11b) && p11b.ids.some(x => /^deepseek-/.test(x)) && Boolean(p11b.note) && /DeepSeek/i.test(p11b.label || ''),
+        JSON.stringify(p11b))
+      await shot('13-provider-deepseek.png')
+      await evaluate(`(() => { const t = ${PROVIDER_TRIGGER}; if (t) t.click(); return Boolean(t) })()`)
+      await waitPop()
+      const pickedBack = await pickOptionByRegex('百炼|Bailian')
+      await sleep(1500)
+      const p11c = await evaluate(`(() => {
+        const panel = document.querySelector('.mh_panel')
+        if (!panel) return null
+        const ids = [...panel.querySelectorAll('.mh_card .mh_id')].map(x => (x.textContent || '').trim())
+        return { n: ids.length, hasQwen: ids.some(x => /qwen/.test(x)), note: Boolean(panel.querySelector('.mh_note')) }
+      })()`)
+      check(11, '切回百炼：目录恢复且无目录路由提示（custom 路由）',
+        pickedBack && Boolean(p11c) && p11c.hasQwen && !p11c.note, JSON.stringify(p11c))
+      const cardRows = await evaluate(`document.querySelectorAll('.mh_cardrow').length`)
+      check(11, 'provider-card 快捷状态 ≥1 行（泛化到 hub 平台）', cardRows >= 1, String(cardRows))
+      await shot('14-provider-cards.png')
+
+      // [12] v0.4 选择器徽标（尽力而为）：composer 模型菜单内 aliyun 模型行应带 ★/✓ 徽标。
+      // 只开菜单/钻取模型面板，绝不点选模型行（不改会话选择）。找不到 composer 则 SKIP。
+      await key('Escape', 'Escape', 27)
+      await sleep(600)
+      await evaluate(`(() => { const d = document.querySelector('[role="dialog"]'); if (!d) return false; const b = d.querySelector('button[aria-label="关闭"],button[aria-label="Close"]'); if (b) { b.click(); return true } return false })()`)
+      await sleep(800)
+      const TRIGGER12 = `[...document.querySelectorAll('button[aria-haspopup="menu"]')].find(b => /^(选择模型，当前|Select model, current)/i.test((b.getAttribute('aria-label') || '').trim()))`
+      const trig12 = await evaluate(`(() => { const t = ${TRIGGER12}; if (!t) return null; const r = t.getBoundingClientRect(); return { aria: t.getAttribute('aria-label'), visible: r.width > 0 && r.height > 0 } })()`)
+      if (!trig12 || !trig12.visible) {
+        skip(12, '选择器徽标', '当前视图无可见 composer 模型触发器（无活动会话或布局不便），不算失败')
+      } else {
+        await evaluate(`(() => { const t = ${TRIGGER12}; t.click(); return true })()`)
+        await sleep(700)
+        const drilled = await evaluate(`(() => {
+          const menu = document.querySelector('[aria-label="模型与推理等级"],[aria-label="Model and reasoning effort"]')
+          if (!menu) return false
+          const cell = [...menu.querySelectorAll('button[role="menuitem"]')].find(b => /^(模型|Model)$/.test(((b.querySelector('span') || {}).textContent || '').trim()))
+          if (!cell) return false
+          cell.click()
+          return true
+        })()`)
+        let badgeState = { badges: 0, aliyunBadges: 0, aliyunRows: 0 }
+        const t12 = Date.now()
+        while (Date.now() - t12 < 10000) {
+          badgeState = await evaluate(`(() => {
+            const menu = document.querySelector('[aria-label="模型与推理等级"],[aria-label="Model and reasoning effort"]')
+            if (!menu) return { badges: 0, aliyunBadges: 0, aliyunRows: 0 }
+            const rows = [...menu.querySelectorAll('[data-provider-id="aliyun"]')]
+            return { badges: menu.querySelectorAll('.mh_label_badge').length, aliyunBadges: rows.reduce((n, r) => n + r.querySelectorAll('.mh_label_badge').length, 0), aliyunRows: rows.length }
+          })()`)
+          if (badgeState.aliyunBadges > 0) break
+          await sleep(500)
+        }
+        check(12, '模型菜单 aliyun 模型行带 hub 徽标（★/✓，经目录索引缓存）', drilled && badgeState.aliyunBadges >= 1, JSON.stringify({ drilled, ...badgeState }))
+        await shot('15-selector-badges.png')
+        await key('Escape', 'Escape', 27)
+        await sleep(300)
+        await key('Escape', 'Escape', 27)
+        await sleep(300)
+      }
 
       // [10] 只读安全自检：全程不得发出写操作请求（保护运行时目录）。
       const writes = requests.filter(r => r.method !== 'GET' && /\/(apply|discover|verify|set-default|edit|reset|measure-max-output)(\?|$)/.test(r.url))

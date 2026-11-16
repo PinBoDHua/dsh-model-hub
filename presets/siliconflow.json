@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "provider": "siliconflow",
+  "displayName": "硅基流动",
+  "api": "openai-completions",
+  "baseURL": "https://api.siliconflow.cn/v1",
+  "apiKeyEnv": "SILICONFLOW_API_KEY",
+  "kind": "custom",
+  "generatedAt": null,
+  "source": "discovery-first (model ids vary by platform account)",
+  "discoveryHint": true,
+  "models": []
+}

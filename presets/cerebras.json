@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "provider": "cerebras",
+  "displayName": "Cerebras",
+  "api": "openai-completions",
+  "baseURL": "https://api.cerebras.ai/v1",
+  "apiKeyEnv": "CEREBRAS_API_KEY",
+  "kind": "catalog",
+  "generatedAt": "2026-11-16T13:05:57.306Z",
+  "source": "pi-ai installed catalog (cerebras)",
+  "models": [
+    {
+      "id": "gpt-oss-120b",
+      "name": "GPT OSS 120B",
+      "contextWindow": 131072,
+      "maxTokens": 40960,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    },
+    {
+      "id": "qwen-3.8-27b",
+      "name": "Qwen3.8 27B",
+      "contextWindow": 131072,
+      "maxTokens": 40960,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "off": "none",
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    }
+  ]
+}

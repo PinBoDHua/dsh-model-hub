@@ -1,7 +1,7 @@
 {
   "name": "dsh-model-hub",
-  "version": "0.3.0",
-  "description": "模型库 —— DeepSeek Harness 百炼模型接入管理层：在官方 dsh-llm-pi-ai 适配器之上，提供经实测的百炼模型目录（推理档位/developer角色/工具/maxTokens字段逐模型验证）、一键智能合并应用（保留用户自加模型、复用凭据）、运行时复验与端点发现兜底；嵌入官方 Models 设置页（footer 模型库面板 + provider-card 状态），并给官方模型选择器注入已验证/推荐徽标。Model hub for DeepSeek Harness: a verified Bailian model catalog with one-click smart-merge apply on top of the official pi-ai adapter.",
+  "version": "0.4.0",
+  "description": "模型库 —— DeepSeek Harness 多平台模型接入管理层：在官方 dsh-llm-pi-ai 适配器之上，提供 16 个主流平台（百炼/DeepSeek/Kimi/智谱/硅基流动/火山方舟/MiniMax/OpenAI/Anthropic/Gemini/OpenRouter/Groq/xAI/Mistral/Together/Cerebras）的模型目录与四协议探测引擎（openai-completions/responses、anthropic-messages、google-generative-ai）、一键智能合并应用（保留用户自加模型、复用凭据）、运行时复验与端点发现兜底；嵌入官方 Models 设置页（footer 模型库面板 + provider-card 状态），并给官方模型选择器注入已验证/推荐徽标。Model hub for DeepSeek Harness: multi-provider verified model catalogs with one-click smart-merge apply on top of the official pi-ai adapter.",
   "type": "module",
   "main": "index.js",
   "icon": "./icon.svg",
@@ -15,16 +15,27 @@
     "deepseek-harness",
     "dsh",
     "dsh-plugin",
+    "model-catalog",
+    "multi-provider",
     "bailian",
     "aliyun",
-    "model-catalog",
+    "openai",
+    "anthropic",
+    "gemini",
+    "deepseek-api",
+    "kimi",
+    "zhipu",
+    "siliconflow",
+    "volcengine",
+    "openrouter",
     "reasoning-effort"
   ],
   "scripts": {
-    "test": "node --test tests/config.test.mjs tests/catalog.test.mjs tests/merge.test.mjs tests/validate.test.mjs tests/edit.test.mjs tests/discover.test.mjs tests/probe.test.mjs tests/routes.test.mjs tests/client.test.mjs",
+    "test": "node --test tests/config.test.mjs tests/catalog.test.mjs tests/merge.test.mjs tests/validate.test.mjs tests/edit.test.mjs tests/discover.test.mjs tests/probe.test.mjs tests/routes.test.mjs tests/client.test.mjs tests/providers.test.mjs tests/protocols.test.mjs tests/presets.test.mjs tests/multi-service.test.mjs",
     "test:dsh": "node scripts/test-dsh.mjs",
     "verify": "npm test && npm run test:dsh",
-    "probe": "node scripts/probe-bailian.mjs"
+    "probe": "node scripts/probe-bailian.mjs",
+    "gen-presets": "node scripts/gen-presets.mjs"
   },
   "dsh": {
     "manifestVersion": 1,
@@ -46,7 +57,7 @@
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json",
     "./locale/*.json": "./locale/*.json",
-    "./presets/bailian.json": "./presets/bailian.json",
+    "./presets/*.json": "./presets/*.json",
     "./icon": "./icon.svg"
   },
   "files": [

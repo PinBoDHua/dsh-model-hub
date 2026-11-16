@@ -79,7 +79,7 @@ const basePiAi = {
 
 test('插件元数据与注入服务', () => {
   assert.equal(name, 'dsh-model-hub')
-  assert.equal(version, '0.3.0')
+  assert.equal(version, '0.4.0')
   assert.deepEqual(inject, ['configEditor', 'webServer', 'credentials'])
 })
 

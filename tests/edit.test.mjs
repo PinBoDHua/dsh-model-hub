@@ -52,3 +52,17 @@ test('applyEdit 已有 capacitySource 继承', () => {
   assert.equal(n.capacitySource.context, 'manual')
   assert.equal(n.capacitySource.maxOutput, 'measured')
 })
+
+// ===== v0.4.0 manualFields 追踪 =====
+
+test('applyEdit 累积 manualFields', () => {
+  const n1 = applyEdit(entry, { maxTokens: 5 })
+  assert.deepEqual(n1.manualFields, ['maxTokens'])
+  const n2 = applyEdit(n1, { reasoningEfforts: false, compat: {} })
+  assert.deepEqual(n2.manualFields.sort(), ['compat', 'maxTokens', 'reasoningEfforts'])
+})
+
+test('applyEdit 无受追踪字段不产生 manualFields', () => {
+  const n = applyEdit(entry, { name: ' renamed' })
+  assert.equal(n.manualFields, undefined)
+})

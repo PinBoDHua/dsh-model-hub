@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "provider": "groq",
+  "displayName": "Groq",
+  "api": "openai-completions",
+  "baseURL": "https://api.groq.com/openai/v1",
+  "apiKeyEnv": "GROQ_API_KEY",
+  "kind": "catalog",
+  "generatedAt": "2026-11-16T13:05:57.304Z",
+  "source": "pi-ai installed catalog (groq)",
+  "models": [
+    {
+      "id": "openai/gpt-oss-120b",
+      "name": "GPT OSS 120B",
+      "contextWindow": 131072,
+      "maxTokens": 65536,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    },
+    {
+      "id": "qwen/qwen3.8-27b",
+      "name": "Qwen3.8 27B",
+      "contextWindow": 131042,
+      "maxTokens": 16384,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "off": "none",
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    },
+    {
+      "id": "llama-3.3-70b-versatile",
+      "name": "Llama 3.3 70B",
+      "contextWindow": 131072,
+      "maxTokens": 32768,
+      "input": [
+        "text"
+      ],
+      "reasoning": false,
+      "reasoningEfforts": false,
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    },
+    {
+      "id": "openai/gpt-oss-20b",
+      "name": "GPT OSS 20B",
+      "contextWindow": 131072,
+      "maxTokens": 65536,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    },
+    {
+      "id": "llama-3.1-8b-instant",
+      "name": "Llama 3.1 8B",
+      "contextWindow": 131072,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoning": false,
+      "reasoningEfforts": false,
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    },
+    {
+      "id": "qwen/qwen3.6-27b",
+      "name": "Qwen3.6 27B",
+      "contextWindow": 131072,
+      "maxTokens": 16384,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "off": "none",
+        "high": "default"
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    },
+    {
+      "id": "openai/gpt-oss-safeguard-20b",
+      "name": "Safety GPT OSS 20B",
+      "contextWindow": 131072,
+      "maxTokens": 65536,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true
+    }
+  ]
+}

@@ -3,9 +3,9 @@
  * 纯逻辑函数经 UMD 尾部导出供 node 单测；浏览器侧注册惰性 factory。
  * 与 dsh-memory 同一产物形态：window.__ModuleLoader__.load。
  *
- * UI：官方 Models 设置页 footer 槽（模型库面板）+ provider-card 槽（aliyun 快捷状态）
- * + conversation.input.model.label 槽（选择器已验证/推荐徽标，非交互内联）。
- * 数据面：同源 fetch /plugins/dsh-model-hub/*（进程级 token，写操作带 X-RPC-Key）。
+ * UI：官方 Models 设置页 footer 槽（多平台模型库面板）+ provider-card 槽（16 平台快捷状态）
+ * + conversation.input.model.label 槽（选择器已验证/推荐徽标，经 hub 目录索引缓存，非交互内联）。
+ * 数据面：同源 fetch /plugins/dsh-model-hub/*（进程级 token，写操作带 X-RPC-Key；可选 provider 参数）。
  * 视觉：扁平克制、跟随宿主明暗主题（--dsw-alias-* 令牌 + body[data-ds-dark-theme]）。
  */
 (function (global) {
@@ -163,11 +163,36 @@
     return -1
   }
 
+  // ===== v0.4 多平台纯逻辑 =====
+
+  // 平台下拉选项：label 经 nameOf 本地化（宿主 locale.resolveText），hint=已接入模型数。
+  function providerOptions(providers, nameOf) {
+    var list = Array.isArray(providers) ? providers : []
+    return list.map(function (p) {
+      var label = ''
+      try { label = nameOf ? nameOf(p) : '' } catch (e) { label = '' }
+      if (!label) label = (p.displayName && (p.displayName.zh || p.displayName.en)) || p.id
+      var hint = p.configured && p.modelCount ? String(p.modelCount) : ''
+      return { value: p.id, label: label, hint: hint }
+    })
+  }
+
+  // 编辑器 compat 控件按协议门禁（镜像服务端 validate.js / 官方 COMPAT_GATES）。
+  function compatVisible(protocol) {
+    if (protocol === 'openai-completions') return { devRole: true, thinkingFormat: true, maxTokensField: true }
+    if (protocol === 'openai-responses') return { devRole: true, thinkingFormat: false, maxTokensField: false }
+    return { devRole: false, thinkingFormat: false, maxTokensField: false }
+  }
+
   // ===== locale =====
 
   var NS = 'dsh-model-hub'
   var ZH = {
-    title: '百炼模型库', subtitle: '实测目录 · 一键接入 · 智能合并',
+    title: '模型库', subtitle: '多平台目录 · 一键接入 · 智能合并',
+    providerLabel: '平台', effortAlways: '持续思考（无档位）',
+    emptyDiscovery: '目录为空——点「发现新模型」拉取平台模型列表',
+    catalogNote: '目录路由：容量/协议/推理元数据继承官方 pi-ai 目录；复验只记录证据，手动编辑才写入配置。',
+    catalogInherit: '继承官方目录',
     search: '搜索模型 id / 名称', filterLabel: '筛选模型', filterAll: '全部', filterRecommended: '推荐', filterVerified: '已验证', filterUnverified: '未验证',
     selectRecommended: '选中推荐', clear: '清空选择', applySelected: '应用选中', discover: '发现新模型', verifyAll: '全部复验',
     context: '上下文', maxOutput: '最大输出', input: '输入', effort: '推理档位', effortNone: '非推理',
@@ -182,12 +207,16 @@
     edit: '编辑', collapse: '收起', save: '保存', cancel: '取消', measure: '实测最大输出', measuring: '实测中…',
     reset: '重置目录', resetConfirm: '确认重置?', reasoningModel: '推理模型', addLevel: '加档位', level: '档位', wire: 'API 值',
     compatDev: 'developer 角色', compatFormat: '思考格式', compatField: '输出字段', unset: '默认',
-    evidence: '实测证据', capacitySource: '容量来源', estimate: '估计', manual: '手动', measured: '实测',
+    evidence: '实测证据', capacitySource: '容量来源', estimate: '估计', manual: '手动', measured: '实测', catalog: '官方目录',
     toastEdited: '已保存 {m}', toastReset: '目录已重置', toastMeasured: '{m} 最大输出实测 {v}', toastMeasureFail: '无法实测：{r}',
     errFields: '字段无效：{f}', devOk: '接受', devRejected: '拒绝', toolsOk: '支持', toolsFail: '不支持',
   }
   var EN = {
-    title: 'Bailian Model Hub', subtitle: 'Verified catalog · one-click apply · smart merge',
+    title: 'Model Hub', subtitle: 'Multi-provider catalogs · one-click apply · smart merge',
+    providerLabel: 'Platform', effortAlways: 'Always thinking (no levels)',
+    emptyDiscovery: 'Catalog is empty — use Discover to fetch the platform model list',
+    catalogNote: 'Catalog route: capacities/protocol/reasoning inherit the official pi-ai catalog; re-verify records evidence only, manual edits write config.',
+    catalogInherit: 'inherits official catalog',
     search: 'Search model id / name', filterLabel: 'Filter models', filterAll: 'All', filterRecommended: 'Recommended', filterVerified: 'Verified', filterUnverified: 'Unverified',
     selectRecommended: 'Select recommended', clear: 'Clear', applySelected: 'Apply selected', discover: 'Discover', verifyAll: 'Re-verify all',
     context: 'Context', maxOutput: 'Max output', input: 'Input', effort: 'Effort', effortNone: 'Non-reasoning',
@@ -202,7 +231,7 @@
     edit: 'Edit', collapse: 'Collapse', save: 'Save', cancel: 'Cancel', measure: 'Measure max output', measuring: 'Measuring…',
     reset: 'Reset catalog', resetConfirm: 'Confirm reset?', reasoningModel: 'Reasoning model', addLevel: 'Add level', level: 'Level', wire: 'API value',
     compatDev: 'developer role', compatFormat: 'Thinking format', compatField: 'Output field', unset: 'default',
-    evidence: 'Probe evidence', capacitySource: 'Capacity source', estimate: 'estimate', manual: 'manual', measured: 'measured',
+    evidence: 'Probe evidence', capacitySource: 'Capacity source', estimate: 'estimate', manual: 'manual', measured: 'measured', catalog: 'official catalog',
     toastEdited: 'Saved {m}', toastReset: 'Catalog reset', toastMeasured: '{m} max output measured {v}', toastMeasureFail: 'Cannot measure: {r}',
     errFields: 'Invalid fields: {f}', devOk: 'accepts', devRejected: 'rejects', toolsOk: 'supported', toolsFail: 'unsupported',
   }
@@ -295,6 +324,11 @@
     '@keyframes mh_fade{from{opacity:0;}to{opacity:1;}}',
     '@media (prefers-reduced-motion:reduce){.mh_select_trigger,.mh_select_chev,.mh_select_pop{animation:none !important;transition:none !important;}}',
     '.mh_select_disabled:hover{border-color:var(--mh-line);background:transparent;}',
+    // ---- v0.4 平台切换行与目录路由提示 ----
+    '.mh_provider_row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}',
+    '.mh_provider_label{font-size:12px;color:var(--dsw-alias-text-secondary,#4b5563);flex-shrink:0;}',
+    '.mh_provider_row .mh_selectwrap{max-width:320px;}',
+    '.mh_note{font-size:11px;color:var(--dsw-alias-text-caption,#6b7280);margin-bottom:10px;line-height:1.5;}',
   ].join('\n')
 
   var API_BASE = '/plugins/dsh-model-hub'
@@ -355,15 +389,71 @@
         }
         return {
           status: function () { return request(API_BASE + '/status') },
-          catalog: function () { return request(API_BASE + '/catalog') },
-          apply: function (modelIds) { return post(API_BASE + '/apply', { modelIds: modelIds }, 60000) },
-          discover: function () { return post(API_BASE + '/discover', {}, 90000) },
-          verify: function (modelIds) { return post(API_BASE + '/verify', { modelIds: modelIds }, 300000) },
+          catalog: function (provider) { return request(API_BASE + '/catalog' + (provider ? '?provider=' + encodeURIComponent(provider) : '')) },
+          apply: function (modelIds, provider) { return post(API_BASE + '/apply', { modelIds: modelIds, provider: provider }, 60000) },
+          discover: function (provider) { return post(API_BASE + '/discover', { provider: provider }, 90000) },
+          verify: function (modelIds, provider) { return post(API_BASE + '/verify', { modelIds: modelIds, provider: provider }, 300000) },
           setDefault: function (provider, model) { return post(API_BASE + '/set-default', { provider: provider, model: model }) },
-          edit: function (id, draft) { return post(API_BASE + '/edit', { id: id, draft: draft }, 60000) },
-          reset: function () { return post(API_BASE + '/reset', {}, 60000) },
-          measure: function (id) { return post(API_BASE + '/measure-max-output', { id: id }, 300000) },
+          edit: function (id, draft, provider) { return post(API_BASE + '/edit', { id: id, draft: draft, provider: provider }, 60000) },
+          reset: function (provider) { return post(API_BASE + '/reset', { provider: provider }, 60000) },
+          measure: function (id, provider) { return post(API_BASE + '/measure-max-output', { id: id, provider: provider }, 300000) },
         }
+      }
+
+      // ===== v0.4 hub 目录索引缓存（选择器徽标 + provider-card 泛化共用） =====
+      // 每平台一次 fetch；面板写操作后经 invalidateHubIndex 失效并通知订阅者重读。
+      var hubProvidersCache = { promise: null, data: null }
+      var hubIndex = {}
+      var hubIndexSubs = []
+
+      function loadHubProviders(api) {
+        if (hubProvidersCache.data) return Promise.resolve(hubProvidersCache.data)
+        if (!hubProvidersCache.promise) {
+          hubProvidersCache.promise = api.status().then(function (s) {
+            hubProvidersCache.data = s.providers || []
+            return hubProvidersCache.data
+          }).catch(function (e) { hubProvidersCache.promise = null; throw e })
+        }
+        return hubProvidersCache.promise
+      }
+
+      function hubIndexEntry(providerId) {
+        return hubIndex[providerId] || null
+      }
+
+      function loadHubIndex(api, providerId) {
+        var e = hubIndex[providerId]
+        if (e && (e.byId || e.promise)) return e.promise || Promise.resolve(e)
+        var entry = { byId: null, promise: null }
+        entry.promise = api.catalog(providerId).then(function (cat) {
+          var map = {}
+          var models = (cat && cat.models) || []
+          for (var i = 0; i < models.length; i++) {
+            map[models[i].id] = { recommended: !!models[i].recommended, verified: !!models[i].evidence }
+          }
+          entry.byId = map
+          notifyHubIndex()
+          return entry
+        }).catch(function () { entry.byId = {}; return entry })
+        hubIndex[providerId] = entry
+        return entry.promise
+      }
+
+      function invalidateHubIndex(providerId) {
+        if (providerId) delete hubIndex[providerId]
+        else hubIndex = {}
+        hubProvidersCache.data = null
+        hubProvidersCache.promise = null
+        notifyHubIndex()
+      }
+
+      function notifyHubIndex() {
+        for (var i = 0; i < hubIndexSubs.length; i++) { try { hubIndexSubs[i]() } catch (e) { /* 订阅者容错 */ } }
+      }
+
+      function subscribeHubIndex(fn) {
+        hubIndexSubs.push(fn)
+        return function () { var i = hubIndexSubs.indexOf(fn); if (i >= 0) hubIndexSubs.splice(i, 1) }
       }
 
       function Badge(props) {
@@ -561,6 +651,7 @@
 
       function EditorForm(props) {
         var entry = props.entry, t = props.t
+        var vis = compatVisible(props.protocol || 'openai-completions')
         var ds = useState(function () { return draftFromEntry(entry) })
         var draft = ds[0], setDraft = ds[1]
         var es = useState(null), err = es[0], setErr = es[1]
@@ -583,7 +674,7 @@
             h('input', { className: 'mh_enum', type: 'number', value: draft.contextWindow, onChange: function (e) { set({ contextWindow: e.target.value }) } }),
             h('span', { className: 'mh_elabel' }, t('maxOutput')),
             h('input', { className: 'mh_enum', type: 'number', value: draft.maxTokens, onChange: function (e) { set({ maxTokens: e.target.value }) } }),
-            h('button', { className: 'mh_mini', onClick: function () { props.onMeasure(entry.id) }, disabled: props.busy }, t('measure'))),
+            props.canMeasure ? h('button', { className: 'mh_mini', onClick: function () { props.onMeasure(entry.id) }, disabled: props.busy }, t('measure')) : null),
           h('div', { className: 'mh_erow' },
             h('span', { className: 'mh_elabel' }, t('input')),
             h('label', { className: 'mh_echeck' }, h('input', { type: 'checkbox', checked: draft.input.indexOf('text') >= 0, onChange: function () { toggleInput('text') } }), t('text')),
@@ -598,20 +689,21 @@
                 h('button', { className: 'mh_mini', onClick: function () { delRow(i) } }, '×'))
             }),
             h('button', { className: 'mh_mini', onClick: addRow }, t('addLevel'))) : null,
-          h('div', { className: 'mh_erow' },
-            h('span', { className: 'mh_elabel' }, t('compatDev')),
-            h(Select, { options: devRoleOptions(t), value: draft.devRole, onChange: function (v) { set({ devRole: v }) }, minWidth: 100, ariaLabel: t('compatDev') }),
-            h('span', { className: 'mh_elabel' }, t('compatFormat')),
-            h(Select, { options: formatOptions(t), value: draft.thinkingFormat, onChange: function (v) { set({ thinkingFormat: v }) }, minWidth: 170, ariaLabel: t('compatFormat') }),
-            h('span', { className: 'mh_elabel' }, t('compatField')),
-            h(Select, { options: fieldOptions(t), value: draft.maxTokensField, onChange: function (v) { set({ maxTokensField: v }) }, minWidth: 180, ariaLabel: t('compatField') })),
+          (vis.devRole || vis.thinkingFormat || vis.maxTokensField) ? h('div', { className: 'mh_erow' },
+            vis.devRole ? h('span', { className: 'mh_elabel' }, t('compatDev')) : null,
+            vis.devRole ? h(Select, { options: devRoleOptions(t), value: draft.devRole, onChange: function (v) { set({ devRole: v }) }, minWidth: 100, ariaLabel: t('compatDev') }) : null,
+            vis.thinkingFormat ? h('span', { className: 'mh_elabel' }, t('compatFormat')) : null,
+            vis.thinkingFormat ? h(Select, { options: formatOptions(t), value: draft.thinkingFormat, onChange: function (v) { set({ thinkingFormat: v }) }, minWidth: 170, ariaLabel: t('compatFormat') }) : null,
+            vis.maxTokensField ? h('span', { className: 'mh_elabel' }, t('compatField')) : null,
+            vis.maxTokensField ? h(Select, { options: fieldOptions(t), value: draft.maxTokensField, onChange: function (v) { set({ maxTokensField: v }) }, minWidth: 180, ariaLabel: t('compatField') }) : null) : null,
           h('div', { className: 'mh_evidence' },
             h('span', null, t('evidence') + ':'),
             h('span', null, 'developer ' + (ev.developerRole === 'ok' ? t('devOk') : ev.developerRole === 'rejected' ? t('devRejected') : '—')),
             h('span', null, 'tools ' + (ev.tools === 'ok' ? t('toolsOk') : ev.tools === 'fail' ? t('toolsFail') : '—')),
             h('span', null, (ev.maxTokensField || '—')),
             h('span', null, (ev.testedAt || '').slice(0, 10)),
-            h('span', null, t('capacitySource') + ': ' + t(cap.context || 'estimate') + '/' + t(cap.maxOutput || 'estimate'))),
+            h('span', null, t('capacitySource') + ': ' + t(cap.context || 'estimate') + '/' + t(cap.maxOutput || 'estimate')),
+            entry.catalogModel ? h('span', null, t('catalogInherit')) : null),
           err ? h('div', { className: 'mh_toast mh_toast_err' }, err) : null,
           h('div', { className: 'mh_eactions' },
             h('button', { className: 'mh_btn mh_btn_primary', onClick: save, disabled: props.busy }, t('save')),
@@ -634,12 +726,12 @@
             h('span', null, t('context') + ' ' + fmtTokens(m.contextWindow)),
             h('span', null, t('maxOutput') + ' ' + fmtTokens(m.maxTokens)),
             h('span', null, t('input') + ' ' + inputs)),
-          h('div', { className: 'mh_effort' }, t('effort') + ': ' + (efforts || t('effortNone'))),
+          h('div', { className: 'mh_effort' }, t('effort') + ': ' + (efforts || (m.reasoning ? t('effortAlways') : t('effortNone')))),
           h('div', { className: 'mh_card_actions' },
             h('button', { className: 'mh_mini', onClick: function () { props.onSetDefault(m.id) }, disabled: props.busy }, t('setDefault')),
             h('button', { className: 'mh_mini', onClick: function () { props.onVerify(m.id) }, disabled: props.busy }, t('verify')),
             h('button', { className: 'mh_mini', onClick: function () { setExpanded(!expanded) } }, expanded ? t('collapse') : t('edit'))),
-          expanded ? h(EditorForm, { entry: m, t: t, busy: props.busy, onSave: function (payload) { props.onEdit(m.id, payload) }, onCancel: function () { setExpanded(false) }, onMeasure: props.onMeasure }) : null)
+          expanded ? h(EditorForm, { entry: m, t: t, busy: props.busy, protocol: props.protocol, canMeasure: props.canMeasure, onSave: function (payload) { props.onEdit(m.id, payload) }, onCancel: function () { setExpanded(false) }, onMeasure: props.onMeasure }) : null)
       }
 
       function HubPanel(props) {
@@ -650,73 +742,99 @@
         var api = apiRef.current
         var st = useState({ loading: true, catalog: null, status: null, error: null })
         var state = st[0], setState = st[1]
+        var pv = useState('aliyun'), provider = pv[0], setProvider = pv[1]
         var sel = useState([]), selected = sel[0], setSelected = sel[1]
         var q = useState(''), query = q[0], setQuery = q[1]
         var f = useState('all'), filter = f[0], setFilter = f[1]
         var b = useState(''), busy = b[0], setBusy = b[1]
         var tt = useState(null), toast = tt[0], setToast = tt[1]
         var ra = useState(false), resetArm = ra[0], setResetArm = ra[1]
+        var seqRef = useRef(0)
 
         var showToast = useCallback(function (text, kind) { setToast({ text: text, kind: kind || 'ok', id: Date.now() }) }, [])
 
-        var refresh = useCallback(function () {
-          return Promise.all([api.status(), api.catalog()]).then(function (r) {
+        // 平台切换竞态守卫：仅采纳最新一次请求的结果。
+        var refresh = useCallback(function (pid) {
+          var seq = ++seqRef.current
+          return Promise.all([api.status(), api.catalog(pid)]).then(function (r) {
+            if (seq !== seqRef.current) return
             setState({ loading: false, catalog: r[1], status: r[0], error: null })
-          }).catch(function (e) { setState(function (s) { return Object.assign({}, s, { loading: false, error: String(e.message || e) }) }) })
+          }).catch(function (e) {
+            if (seq !== seqRef.current) return
+            setState(function (s) { return Object.assign({}, s, { loading: false, error: String(e.message || e) }) })
+          })
         }, [api])
 
-        useEffect(function () { refresh() }, [refresh])
+        useEffect(function () { refresh(provider) }, [refresh, provider])
         useEffect(function () { if (!toast) return; var id = setTimeout(function () { setToast(null) }, 4000); return function () { clearTimeout(id) } }, [toast])
+
+        function switchProvider(pid) {
+          if (pid === provider) return
+          setProvider(pid)
+          setSelected([])
+          setResetArm(false)
+        }
 
         function run(name, fn) {
           setBusy(name)
           return fn().then(function (r) { setBusy(''); return r }).catch(function (e) { setBusy(''); showToast(fmt(t('toastError'), { e: String(e.message || e) }), 'err'); throw e })
         }
 
+        function afterMutate() { invalidateHubIndex(provider); refresh(provider) }
+
         function doApply() {
           if (!selected.length) return
-          run('apply', function () { return api.apply(selected) }).then(function (r) { showToast(fmt(t('toastApplied'), { n: r.applied })); setSelected([]); refresh() }).catch(function () {})
+          run('apply', function () { return api.apply(selected, provider) }).then(function (r) { showToast(fmt(t('toastApplied'), { n: r.applied })); setSelected([]); afterMutate() }).catch(function () {})
         }
         function doDiscover() {
-          run('discover', function () { return api.discover() }).then(function (r) { showToast(fmt(t('toastDiscovered'), { n: (r.candidates || []).length, a: r.added || 0 })); refresh() }).catch(function () {})
+          run('discover', function () { return api.discover(provider) }).then(function (r) { showToast(fmt(t('toastDiscovered'), { n: (r.candidates || []).length, a: r.added || 0 })); afterMutate() }).catch(function () {})
         }
         function doVerify(ids) {
-          run('verify', function () { return api.verify(ids) }).then(function (r) { showToast(fmt(t('toastVerified'), { n: r.verified })); refresh() }).catch(function () {})
+          run('verify', function () { return api.verify(ids, provider) }).then(function (r) { showToast(fmt(t('toastVerified'), { n: r.verified })); afterMutate() }).catch(function () {})
         }
         function doSetDefault(id) {
-          var providerId = (state.status && state.status.providerId) || 'aliyun'
-          run('default', function () { return api.setDefault(providerId, id) }).then(function () { showToast(fmt(t('toastDefault'), { m: id })) }).catch(function () {})
+          run('default', function () { return api.setDefault(provider, id) }).then(function () { showToast(fmt(t('toastDefault'), { m: id })) }).catch(function () {})
         }
         function doEdit(id, payload) {
-          run('edit', function () { return api.edit(id, payload) }).then(function () { showToast(fmt(t('toastEdited'), { m: id })); refresh() }).catch(function () {})
+          run('edit', function () { return api.edit(id, payload, provider) }).then(function () { showToast(fmt(t('toastEdited'), { m: id })); afterMutate() }).catch(function () {})
         }
         function doMeasure(id) {
-          run('measure', function () { return api.measure(id) }).then(function (r) {
+          run('measure', function () { return api.measure(id, provider) }).then(function (r) {
             if (r.measured) showToast(fmt(t('toastMeasured'), { m: id, v: fmtTokens(r.value) }))
             else showToast(fmt(t('toastMeasureFail'), { r: r.reason || '' }), 'err')
-            refresh()
+            afterMutate()
           }).catch(function () {})
         }
         function doReset() {
-          run('reset', function () { return api.reset() }).then(function () { showToast(t('toastReset')); setResetArm(false); refresh() }).catch(function () {})
+          run('reset', function () { return api.reset(provider) }).then(function () { showToast(t('toastReset')); setResetArm(false); afterMutate() }).catch(function () {})
         }
 
         if (state.loading) return h('div', { className: 'mh_panel' }, h('div', { className: 'mh_empty' }, t('loading')))
-        if (state.error && !state.catalog) return h('div', { className: 'mh_panel' }, h('div', { className: 'mh_empty' }, t('loadError') + ': ' + state.error, ' ', h('button', { className: 'mh_mini', onClick: refresh }, t('retry'))))
+        if (state.error && !state.catalog) return h('div', { className: 'mh_panel' }, h('div', { className: 'mh_empty' }, t('loadError') + ': ' + state.error, ' ', h('button', { className: 'mh_mini', onClick: function () { refresh(provider) } }, t('retry'))))
 
         var catalog = state.catalog || { models: [] }
         var status = state.status || {}
-        var provider = status.provider || {}
-        var credential = status.credential || {}
+        var providers = status.providers || []
+        var cur = providers.find(function (p) { return p.id === provider }) || {}
+        var credential = cur.credential || {}
         var models = filterModels(catalog.models, query, filter)
         var recIds = (catalog.models || []).filter(function (m) { return m.recommended }).map(function (m) { return m.id })
+        var nameOf = function (p) {
+          try { if (ctx.locale && ctx.locale.resolveText && p.displayName) return ctx.locale.resolveText(p.displayName) } catch (e) { /* 回退 */ }
+          return (p.displayName && (p.displayName.zh || p.displayName.en)) || p.id
+        }
+        var emptyText = catalog.discoveryHint && !(catalog.models || []).length ? t('emptyDiscovery') : t('empty')
 
         return h('div', { className: 'mh_panel' },
           h('div', { className: 'mh_head' }, h('span', { className: 'mh_title' }, t('title')), h('span', { className: 'mh_ver' }, 'v' + (status.version || ''))),
           h('div', { className: 'mh_sub' }, t('subtitle')),
+          h('div', { className: 'mh_provider_row' },
+            h('span', { className: 'mh_provider_label' }, t('providerLabel')),
+            h(Select, { options: providerOptions(providers, nameOf), value: provider, onChange: switchProvider, minWidth: 240, ariaLabel: t('providerLabel') })),
+          cur.kind === 'catalog' ? h('div', { className: 'mh_note' }, t('catalogNote')) : null,
           h('div', { className: 'mh_status' },
-            h('span', null, h('span', { className: 'mh_dot ' + (provider.mounted ? 'mh_dot_ok' : 'mh_dot_bad') }), provider.mounted ? t('mounted') : t('notMounted')),
-            h('span', null, h('span', { className: 'mh_dot ' + (provider.configured ? 'mh_dot_ok' : 'mh_dot_idle') }), (provider.configured ? t('configured') : t('notConfigured')) + ' · ' + (provider.modelCount || 0) + ' ' + t('modelsUnit')),
+            h('span', null, h('span', { className: 'mh_dot ' + (cur.mounted ? 'mh_dot_ok' : 'mh_dot_bad') }), cur.mounted ? t('mounted') : t('notMounted')),
+            h('span', null, h('span', { className: 'mh_dot ' + (cur.configured ? 'mh_dot_ok' : 'mh_dot_idle') }), (cur.configured ? t('configured') : t('notConfigured')) + ' · ' + (cur.modelCount || 0) + ' ' + t('modelsUnit')),
             h('span', null, h('span', { className: 'mh_dot ' + (credential.configured ? 'mh_dot_ok' : 'mh_dot_bad') }), credential.configured ? t('credentialOk') : t('credentialMissing'))),
           h('div', { className: 'mh_toolbar' },
             h('input', { className: 'mh_search', placeholder: t('search'), value: query, onChange: function (e) { setQuery(e.target.value) } }),
@@ -730,33 +848,57 @@
               ? h('button', { className: 'mh_btn mh_btn_danger', onClick: doReset, disabled: busy }, t('resetConfirm'))
               : h('button', { className: 'mh_btn', onClick: function () { setResetArm(true) }, disabled: busy }, t('reset'))),
           models.length === 0
-            ? h('div', { className: 'mh_empty' }, t('empty'))
+            ? h('div', { className: 'mh_empty' }, emptyText)
             : h('div', { className: 'mh_grid' }, models.map(function (m) {
-              return h(ModelCard, { key: m.id, model: m, t: t, selected: selected.indexOf(m.id) >= 0, busy: !!busy, onToggle: function (id) { setSelected(toggleId(selected, id)) }, onSetDefault: doSetDefault, onVerify: function (id) { doVerify([id]) }, onEdit: doEdit, onMeasure: doMeasure })
+              return h(ModelCard, { key: m.id, model: m, t: t, selected: selected.indexOf(m.id) >= 0, busy: !!busy, protocol: cur.api, canMeasure: cur.probe === 'openai-completions', onToggle: function (id) { setSelected(toggleId(selected, id)) }, onSetDefault: doSetDefault, onVerify: function (id) { doVerify([id]) }, onEdit: doEdit, onMeasure: doMeasure })
             })),
           toast ? h('div', { className: 'mh_toast' + (toast.kind === 'err' ? ' mh_toast_err' : '') }, toast.text) : null)
       }
 
       function ProviderCard(props) {
-        var provider = props.provider || {}
+        var entry = props.provider || {}
         var t = props.t
-        if (provider.provider !== 'aliyun') return null
+        var routeId = entry.provider
         var tokenRef = useRef('')
         var apiRef = useRef(null)
         if (apiRef.current === null) apiRef.current = createApi(tokenRef)
         var api = apiRef.current
         var st = useState(null), info = st[0], setInfo = st[1]
+        var hs = useState(false), isHub = hs[0], setIsHub = hs[1]
         var b = useState(false), busy = b[0], setBusy = b[1]
-        useEffect(function () { api.status().then(setInfo).catch(function () {}) }, [api])
+        useEffect(function () {
+          var alive = true
+          function sync() {
+            loadHubProviders(api).then(function (list) {
+              if (!alive) return
+              var mine = list.find(function (p) { return p.id === routeId })
+              setIsHub(!!mine)
+              if (mine) setInfo(mine)
+            }).catch(function () {})
+          }
+          sync()
+          var un = subscribeHubIndex(sync)
+          return function () { alive = false; un() }
+        }, [api, routeId])
+        if (!isHub) return null
         function applyRec() {
           setBusy(true)
-          api.catalog().then(function (cat) {
+          api.catalog(routeId).then(function (cat) {
             var ids = (cat.models || []).filter(function (m) { return m.recommended }).map(function (m) { return m.id })
-            return api.apply(ids)
-          }).then(function () { return api.status() }).then(function (s) { setInfo(s); setBusy(false) }).catch(function () { setBusy(false) })
+            if (!ids.length) { setBusy(false); return null }
+            return api.apply(ids, routeId)
+          }).then(function (r) {
+            if (r === null) return
+            invalidateHubIndex(routeId)
+            return loadHubProviders(api).then(function (list) {
+              var mine = list.find(function (p) { return p.id === routeId })
+              if (mine) setInfo(mine)
+              setBusy(false)
+            })
+          }).catch(function () { setBusy(false) })
         }
-        var p = (info && info.provider) || {}
-        var cred = (info && info.credential) || {}
+        var p = info || {}
+        var cred = p.credential || {}
         return h('div', { className: 'mh_cardrow' },
           h('span', null, h('span', { className: 'mh_dot ' + (cred.configured ? 'mh_dot_ok' : 'mh_dot_bad') }), t('cardTitle')),
           h('span', null, (p.modelCount || 0) + ' ' + t('modelsUnit')),
@@ -766,10 +908,38 @@
       function ModelLabel(props) {
         var provider = props.provider || {}, model = props.model || {}
         var name = model.name || model.id
-        if (provider.id !== 'aliyun') {
+        var tokenRef = useRef('')
+        var apiRef = useRef(null)
+        if (apiRef.current === null) apiRef.current = createApi(tokenRef)
+        var api = apiRef.current
+        var st = useState(0), tick = st[0], setTick = st[1]
+        var hubRef = useRef(false)
+        useEffect(function () {
+          var alive = true
+          function sync() {
+            loadHubProviders(api).then(function (list) {
+              if (!alive) return
+              var mine = list.some(function (p) { return p.id === provider.id })
+              hubRef.current = mine
+              if (mine) loadHubIndex(api, provider.id)
+              setTick(function (x) { return x + 1 })
+            }).catch(function () {})
+          }
+          sync()
+          var un = subscribeHubIndex(function () {
+            if (!hubRef.current) return
+            loadHubIndex(api, provider.id)
+            setTick(function (x) { return x + 1 })
+          })
+          return function () { alive = false; un() }
+        }, [api, provider.id])
+        if (!hubRef.current) {
           return h('span', null, name, model.badge ? h('span', { className: 'mh_label_badge' }, String(model.badge)) : null)
         }
-        var kind = badgeKind(model)
+        var e = hubIndexEntry(provider.id)
+        var meta = e && e.byId ? e.byId[model.id] : null
+        if (!meta) return h('span', null, name)
+        var kind = meta.recommended ? 'recommended' : meta.verified ? 'verified' : 'unverified'
         if (kind === 'unverified') return h('span', null, name)
         return h('span', null, name, h('span', { className: 'mh_label_badge' + (kind === 'recommended' ? ' mh_label_rec' : '') }, kind === 'recommended' ? '★' : '✓'))
       }
@@ -811,6 +981,6 @@
 
   // ===== UMD 尾部：纯逻辑供 node 单测 =====
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { nextToken: nextToken, toggleId: toggleId, badgeKind: badgeKind, filterModels: filterModels, effortSummary: effortSummary, fmtTokens: fmtTokens, fmt: fmt, draftFromEntry: draftFromEntry, draftToPayload: draftToPayload, clientValidate: clientValidate, LEVELS: LEVELS, FORMATS: FORMATS, MAXFIELDS: MAXFIELDS, filterOptions: filterOptions, devRoleOptions: devRoleOptions, levelOptions: levelOptions, formatOptions: formatOptions, fieldOptions: fieldOptions, selectedIndexOf: selectedIndexOf }
+    module.exports = { nextToken: nextToken, toggleId: toggleId, badgeKind: badgeKind, filterModels: filterModels, effortSummary: effortSummary, fmtTokens: fmtTokens, fmt: fmt, draftFromEntry: draftFromEntry, draftToPayload: draftToPayload, clientValidate: clientValidate, LEVELS: LEVELS, FORMATS: FORMATS, MAXFIELDS: MAXFIELDS, filterOptions: filterOptions, devRoleOptions: devRoleOptions, levelOptions: levelOptions, formatOptions: formatOptions, fieldOptions: fieldOptions, selectedIndexOf: selectedIndexOf, providerOptions: providerOptions, compatVisible: compatVisible }
   }
 })(typeof window !== 'undefined' ? window : globalThis)

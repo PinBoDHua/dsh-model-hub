@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "provider": "volcengine",
+  "displayName": "火山方舟（豆包）",
+  "api": "openai-completions",
+  "baseURL": "https://ark.cn-beijing.volces.com/api/v3",
+  "apiKeyEnv": "ARK_API_KEY",
+  "kind": "custom",
+  "generatedAt": null,
+  "source": "discovery-first (Doubao model ids are versioned; endpoint ids are account-specific)",
+  "discoveryHint": true,
+  "models": []
+}

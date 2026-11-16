@@ -1,0 +1,317 @@
+{
+  "schemaVersion": 1,
+  "provider": "anthropic",
+  "displayName": "Anthropic Claude",
+  "api": "anthropic-messages",
+  "baseURL": "https://api.anthropic.com",
+  "apiKeyEnv": "ANTHROPIC_API_KEY",
+  "kind": "catalog",
+  "generatedAt": "2026-11-16T13:05:57.299Z",
+  "source": "pi-ai installed catalog (anthropic)",
+  "models": [
+    {
+      "id": "claude-opus-5-5",
+      "name": "Claude Opus 5.5",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "name": "Claude Sonnet 5.5",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-haiku-5-5",
+      "name": "Claude Haiku 5.5",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max",
+        "off": null
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-opus-5",
+      "name": "Claude Opus 5",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "xhigh": "xhigh",
+        "max": "max",
+        "off": null
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-sonnet-5",
+      "name": "Claude Sonnet 5",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "xhigh": "xhigh",
+        "max": "max",
+        "off": null
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-opus-4-8",
+      "name": "Claude Opus 4.8",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "xhigh": "xhigh",
+        "max": "max",
+        "off": null
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-opus-4-7",
+      "name": "Claude Opus 4.7",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "xhigh": "xhigh",
+        "max": "max",
+        "off": null
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-sonnet-4-6",
+      "name": "Claude Sonnet 4.6",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "max": "max",
+        "off": null
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-fable-5-1",
+      "name": "Claude Fable 5.1",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-fable-5",
+      "name": "Claude Fable 5",
+      "contextWindow": 1000000,
+      "maxTokens": 128000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "adaptive"
+    },
+    {
+      "id": "claude-haiku-4-5",
+      "name": "Claude Haiku 4.5 (latest)",
+      "contextWindow": 200000,
+      "maxTokens": 64000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": false,
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "budget"
+    },
+    {
+      "id": "claude-sonnet-4-5",
+      "name": "Claude Sonnet 4.5 (latest)",
+      "contextWindow": 200000,
+      "maxTokens": 64000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": false,
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "budget"
+    },
+    {
+      "id": "claude-opus-4-5",
+      "name": "Claude Opus 4.5 (latest)",
+      "contextWindow": 200000,
+      "maxTokens": 64000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": false,
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "budget"
+    }
+  ]
+}

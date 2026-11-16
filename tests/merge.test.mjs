@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mergeModels, buildProviderConfig, stripEntry } from '../lib/merge.js'
+import { mergeModels, buildProviderConfig, stripEntry, stripEntryFor } from '../lib/merge.js'
 
 const cat = (id, extra = {}) => ({ id, name: id, contextWindow: 1000000, maxTokens: 131072, input: ['text'], reasoningEfforts: { off: 'none', high: 'high' }, recommended: true, evidence: { testedAt: 'x' }, ...extra })
 
@@ -78,4 +78,40 @@ test('buildProviderConfig 不修改输入', () => {
   const cur = { models: [{ id: 'a' }] }
   buildProviderConfig(cur, [cat('b')], {})
   assert.equal(cur.models.length, 1)
+})
+
+// ===== v0.4.0 目录路由薄写入 =====
+
+test('stripEntryFor catalog 仅 id+name（未手动编辑）', () => {
+  const out = stripEntryFor('catalog', cat('deepseek-flash'))
+  assert.deepEqual(out, { id: 'deepseek-flash', name: 'deepseek-flash' })
+})
+
+test('stripEntryFor catalog 放行 manualFields 字段', () => {
+  const m = cat('deepseek-flash', { manualFields: ['maxTokens', 'reasoningEfforts'] })
+  const out = stripEntryFor('catalog', m)
+  assert.equal(out.maxTokens, 131072)
+  assert.deepEqual(out.reasoningEfforts, { off: 'none', high: 'high' })
+  assert.equal(out.contextWindow, undefined)
+  assert.equal(out.compat, undefined)
+})
+
+test('stripEntryFor custom/缺省 = 全字段（v0.3 行为）', () => {
+  assert.deepEqual(stripEntryFor('custom', cat('x')), stripEntry(cat('x')))
+  assert.deepEqual(stripEntryFor(undefined, cat('x')), stripEntry(cat('x')))
+})
+
+test('mergeModels catalog 薄写入保留用户已在该模型上设置的字段', () => {
+  const cur = [{ id: 'deepseek-flash', contextWindow: 500000, maxTokens: 8000, headers: { 'X-U': '1' } }]
+  const out = mergeModels(cur, [cat('deepseek-flash')], 'catalog')
+  assert.equal(out[0].contextWindow, 500000, '未编辑字段不被薄写入覆盖')
+  assert.equal(out[0].maxTokens, 8000)
+  assert.deepEqual(out[0].headers, { 'X-U': '1' })
+})
+
+test('buildProviderConfig routeApi 仅在 api 未设时写入', () => {
+  const a = buildProviderConfig(undefined, [cat('x')], { kind: 'catalog', routeApi: 'openai-completions' })
+  assert.equal(a.api, 'openai-completions')
+  const b = buildProviderConfig({ api: 'anthropic-messages' }, [cat('x')], { kind: 'catalog', routeApi: 'openai-completions' })
+  assert.equal(b.api, 'anthropic-messages', '用户已设 api 不覆盖')
 })

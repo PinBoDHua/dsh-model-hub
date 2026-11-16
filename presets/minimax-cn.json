@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "provider": "minimax-cn",
+  "displayName": "MiniMax",
+  "api": "anthropic-messages",
+  "baseURL": "https://api.minimaxi.com/anthropic",
+  "apiKeyEnv": "MINIMAX_CN_API_KEY",
+  "kind": "catalog",
+  "generatedAt": "2026-11-16T13:05:57.298Z",
+  "source": "pi-ai installed catalog (minimax-cn)",
+  "models": [
+    {
+      "id": "MiniMax-M2.7",
+      "name": "MiniMax-M2.7",
+      "contextWindow": 204800,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": false,
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "budget"
+    },
+    {
+      "id": "MiniMax-M3",
+      "name": "MiniMax-M3",
+      "contextWindow": 1000000,
+      "maxTokens": 512000,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": false,
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "budget"
+    },
+    {
+      "id": "MiniMax-M2.7-highspeed",
+      "name": "MiniMax-M2.7-highspeed",
+      "contextWindow": 204800,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": false,
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "catalogModel": true,
+      "thinkingStyle": "budget"
+    }
+  ]
+}

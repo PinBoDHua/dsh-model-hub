@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "provider": "zhipu",
+  "displayName": "智谱 GLM",
+  "api": "openai-completions",
+  "baseURL": "https://open.bigmodel.cn/api/paas/v4",
+  "apiKeyEnv": "ZHIPU_API_KEY",
+  "kind": "custom",
+  "generatedAt": "2026-11-16T13:05:57.298Z",
+  "source": "pi-ai installed catalog (zai)",
+  "models": [
+    {
+      "id": "glm-5.3",
+      "name": "GLM-5.3",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "high": "high",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "compat": {
+        "supportsStore": false,
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true,
+        "maxTokensField": "max_tokens",
+        "thinkingFormat": "zai",
+        "supportsStrictMode": true
+      }
+    },
+    {
+      "id": "glm-5.3-flash",
+      "name": "GLM-5.3-Flash",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text",
+        "image"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "high": "high",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "compat": {
+        "supportsStore": false,
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true,
+        "maxTokensField": "max_tokens",
+        "thinkingFormat": "zai",
+        "supportsStrictMode": true
+      }
+    },
+    {
+      "id": "glm-5.3-highspeed",
+      "name": "GLM-5.3 Highspeed",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "low": "low",
+        "high": "high",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "compat": {
+        "supportsStore": false,
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true,
+        "maxTokensField": "max_tokens",
+        "thinkingFormat": "zai",
+        "supportsStrictMode": true
+      }
+    },
+    {
+      "id": "glm-5.2",
+      "name": "GLM-5.2",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": {
+        "off": "none",
+        "high": "high",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "compat": {
+        "supportsStore": false,
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true,
+        "maxTokensField": "max_tokens",
+        "thinkingFormat": "zai",
+        "supportsStrictMode": true
+      }
+    },
+    {
+      "id": "glm-4.7",
+      "name": "GLM-4.7",
+      "contextWindow": 204800,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": false,
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "compat": {
+        "supportsStore": false,
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false,
+        "maxTokensField": "max_tokens",
+        "thinkingFormat": "zai",
+        "supportsStrictMode": true
+      }
+    },
+    {
+      "id": "glm-5-turbo",
+      "name": "GLM-5-Turbo",
+      "contextWindow": 200000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoning": true,
+      "reasoningEfforts": false,
+      "recommended": false,
+      "evidence": null,
+      "capacitySource": {
+        "context": "catalog",
+        "maxOutput": "catalog"
+      },
+      "compat": {
+        "supportsStore": false,
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false,
+        "maxTokensField": "max_tokens",
+        "thinkingFormat": "zai",
+        "supportsStrictMode": true
+      }
+    }
+  ]
+}

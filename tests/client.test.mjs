@@ -171,3 +171,40 @@ test('selectedIndexOf String 宽松比较与未命中', () => {
   assert.equal(selectedIndexOf([], 'x'), -1)
   assert.equal(selectedIndexOf(null, 'x'), -1)
 })
+
+// ===== v0.4 多平台纯逻辑 =====
+
+const { providerOptions, compatVisible } = require('../client/client.js')
+
+test('providerOptions 经 nameOf 本地化并带已接入数 hint', () => {
+  const providers = [
+    { id: 'aliyun', displayName: { zh: '阿里云百炼', en: 'Aliyun Bailian' }, configured: true, modelCount: 16 },
+    { id: 'deepseek', displayName: { zh: 'DeepSeek', en: 'DeepSeek' }, configured: false, modelCount: 0 },
+  ]
+  const opts = providerOptions(providers, (p) => p.displayName.en)
+  assert.equal(opts[0].value, 'aliyun')
+  assert.equal(opts[0].label, 'Aliyun Bailian')
+  assert.equal(opts[0].hint, '16')
+  assert.equal(opts[1].hint, '')
+})
+
+test('providerOptions nameOf 缺失/抛错回退 displayName.zh 或 id', () => {
+  const providers = [{ id: 'x', displayName: { zh: '平台X' } }, { id: 'bare' }]
+  const opts = providerOptions(providers, null)
+  assert.equal(opts[0].label, '平台X')
+  assert.equal(opts[1].label, 'bare')
+  const opts2 = providerOptions(providers, () => { throw new Error('boom') })
+  assert.equal(opts2[0].label, '平台X')
+})
+
+test('providerOptions 非数组输入兜底空列表', () => {
+  assert.deepEqual(providerOptions(null, null), [])
+})
+
+test('compatVisible 协议门禁镜像服务端', () => {
+  assert.deepEqual(compatVisible('openai-completions'), { devRole: true, thinkingFormat: true, maxTokensField: true })
+  assert.deepEqual(compatVisible('openai-responses'), { devRole: true, thinkingFormat: false, maxTokensField: false })
+  for (const p of ['anthropic-messages', 'google-generative-ai', 'mistral-conversations', undefined]) {
+    assert.deepEqual(compatVisible(p), { devRole: false, thinkingFormat: false, maxTokensField: false }, String(p))
+  }
+})

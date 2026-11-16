@@ -1,3 +1,5 @@
-.test-data/
+.test-data*/
 node_modules/
 *.log
+# MSYS 暴露的 Windows 控制台设备节点，非项目文件
+/CON

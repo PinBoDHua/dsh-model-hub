@@ -33,3 +33,23 @@ test('枚举常量齐全', () => {
   assert.equal(THINKING_FORMATS.length, 11)
   assert.deepEqual(MAX_TOKEN_FIELDS, ['max_tokens', 'max_completion_tokens'])
 })
+
+// ===== v0.4.0 协议门禁 =====
+
+test('responses 仅收 devRole，拒 thinkingFormat/maxTokensField', () => {
+  assert.equal(validateDraft({ compat: { supportsDeveloperRole: false } }, 'openai-responses').ok, true)
+  assert.equal(validateDraft({ compat: { thinkingFormat: 'openai' } }, 'openai-responses').ok, false)
+  assert.equal(validateDraft({ compat: { maxTokensField: 'max_tokens' } }, 'openai-responses').ok, false)
+})
+
+test('anthropic/google/mistral 三键均拒', () => {
+  for (const proto of ['anthropic-messages', 'google-generative-ai', 'mistral-conversations']) {
+    assert.equal(validateDraft({ compat: { supportsDeveloperRole: false } }, proto).ok, false, proto)
+    assert.equal(validateDraft({ compat: {} }, proto).ok, true, proto + ' 空 compat=清除')
+    assert.equal(validateDraft({ reasoningEfforts: { high: 'high' } }, proto).ok, true, proto + ' efforts 仍可编辑')
+  }
+})
+
+test('缺省协议＝completions（旧调用保绿）', () => {
+  assert.equal(validateDraft({ compat: { thinkingFormat: 'qwen', maxTokensField: 'max_completion_tokens' } }).ok, true)
+})
