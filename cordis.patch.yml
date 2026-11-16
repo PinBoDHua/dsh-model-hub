@@ -1,0 +1,8 @@
+# dsh-model-hub bundle patch
+#
+# 必须是 `insert`：裸写 `- id:` 是按 id 覆盖已存在条目的写法，
+# id 找不到时 dsh-app-boot 只警告并跳过，插件永远不会挂载。
+# 配置默认值由 lib/config.js 提供，这里不写 config。
+- insert:
+    - id: dsh-model-hub
+      name: dsh-model-hub

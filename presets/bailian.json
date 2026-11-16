@@ -1,0 +1,988 @@
+{
+  "schemaVersion": 1,
+  "provider": "aliyun",
+  "displayName": "阿里云百炼",
+  "api": "openai-completions",
+  "baseURL": "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+  "apiKeyEnv": "ALIYUN_API_KEY",
+  "generatedAt": "2026-11-16T09:50:08.958Z",
+  "models": [
+    {
+      "id": "qwen3.7-max",
+      "name": "qwen3.7-max",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 127,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 125,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 193,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 198,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:05.290Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "qwen3.7-plus",
+      "name": "qwen3.7-plus",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 143,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 142,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 164,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 164,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:05.311Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "qwen3.6-flash",
+      "name": "qwen3.6-flash",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 134,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 150,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 154,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 124,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:05.311Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "glm-5.2",
+      "name": "glm-5.2",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 94,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 80,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 65,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 115,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 87,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:05.311Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "name": "deepseek-v4-pro",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 26,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 25,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 33,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 25,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 24,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:11.586Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "deepseek-v4-flash-0731",
+      "name": "deepseek-v4-flash-0731",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 25,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 57,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 25,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 6,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 6,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 30,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:22.245Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "qwen3.8-max",
+      "name": "qwen3.8-max",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 15,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 15,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 26,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 22,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 19,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 23,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:24.414Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "deepseek-v4-pro-0813",
+      "name": "deepseek-v4-pro-0813",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 12,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 13,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 20,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 16,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:29.861Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "qwen3.8-flash",
+      "name": "qwen3.8-flash",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 16,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 26,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 19,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 25,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 24,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 18,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:29.994Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "deepseek-v4.1-flash",
+      "name": "deepseek-v4.1-flash",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 32,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 7,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 13,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 15,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 21,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:33.664Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "glm-5.3",
+      "name": "glm-5.3",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "low": "low",
+        "high": "high",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 68,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:37.564Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "ok",
+        "tools": "ok"
+      }
+    },
+    {
+      "id": "auto",
+      "name": "auto",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": false,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": false,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 16,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 11,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 11,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 27,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 29,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 23,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:38.111Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "deepseek-v4.1-flash-1017",
+      "name": "deepseek-v4.1-flash-1017",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 14,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 6,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 6,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:40.384Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "qwen4-max-preview",
+      "name": "qwen4-max-preview",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 7,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 7,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 51,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 27,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:40.649Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    },
+    {
+      "id": "qwen4-max",
+      "name": "qwen4-max",
+      "contextWindow": 1000000,
+      "maxTokens": 131072,
+      "input": [
+        "text"
+      ],
+      "reasoningEfforts": {
+        "off": "none",
+        "minimal": "minimal",
+        "low": "low",
+        "medium": "medium",
+        "high": "high",
+        "xhigh": "xhigh",
+        "max": "max"
+      },
+      "recommended": true,
+      "evidence": {
+        "efforts": {
+          "off": {
+            "ok": true,
+            "reasoningTokens": 0,
+            "wire": "none"
+          },
+          "minimal": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "minimal"
+          },
+          "low": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "low"
+          },
+          "medium": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "medium"
+          },
+          "high": {
+            "ok": true,
+            "reasoningTokens": 10,
+            "wire": "high"
+          },
+          "xhigh": {
+            "ok": true,
+            "reasoningTokens": 22,
+            "wire": "xhigh"
+          },
+          "max": {
+            "ok": true,
+            "reasoningTokens": 25,
+            "wire": "max"
+          }
+        },
+        "testedAt": "2026-11-16T09:49:43.934Z",
+        "maxTokensField": "max_tokens",
+        "developerRole": "rejected",
+        "developerError": "developer is not one of ['system', 'assistant', 'user', 'tool', 'function']",
+        "tools": "ok"
+      },
+      "compat": {
+        "supportsDeveloperRole": false
+      }
+    }
+  ],
+  "capacityNote": "contextWindow/maxTokens 为保守估计值（非实测）；行为（effort/developer角色/工具/maxTokens字段）已实测。"
+}
